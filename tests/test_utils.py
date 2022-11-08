@@ -2,7 +2,6 @@
 
 import sys
 import unittest
-import pylab as plt
 import astropy.units as u
 import numpy as np
 from astropy.coordinates import SkyCoord
@@ -28,7 +27,21 @@ class TestAngSep(unittest.TestCase):
         skycoord_distances = c_distances.value
         for i in range(number_of_points):
             self.assertAlmostEqual(angsep_distances[i], skycoord_distances[i])
+    
+    def test_angsep_single(self):
+        """Testing that single points should give a distance too."""
+        number_of_points = 100
+        right_ascentions_a = (np.random.random(number_of_points) * 2 * np.pi) * (180./np.pi)
+        declinations_a = np.arcsin(np.random.random(number_of_points)*2 - 1)
+        right_ascentions_b = (np.random.random(number_of_points) * 2 * np.pi) * (180./np.pi)
+        declinations_b = np.arcsin(np.random.random(number_of_points)*2 - 1)
 
+        for i in range(number_of_points):
+            c_a = SkyCoord(ra = right_ascentions_a[i] * u.deg, dec = declinations_a[i] * u.deg)
+            c_b = SkyCoord(ra = right_ascentions_b[i] * u.deg, dec = declinations_b[i] * u.deg)
+            sep = c_a.separation(c_b)
+            self.assertAlmostEqual(sep.value, pu.calculate_angular_seperation(
+                right_ascentions_a[i], declinations_a[i], right_ascentions_b[i], declinations_b[i]))
 
 if __name__ == '__main__':
     unittest.main()
