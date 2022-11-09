@@ -27,7 +27,7 @@ class TestAngSep(unittest.TestCase):
         skycoord_distances = c_distances.value
         for i in range(number_of_points):
             self.assertAlmostEqual(angsep_distances[i], skycoord_distances[i])
-    
+
     def test_angsep_single(self):
         """Testing that single points should give a distance too."""
         number_of_points = 100
@@ -42,6 +42,15 @@ class TestAngSep(unittest.TestCase):
             sep = c_a.separation(c_b)
             self.assertAlmostEqual(sep.value, pu.calculate_angular_seperation(
                 right_ascentions_a[i], declinations_a[i], right_ascentions_b[i], declinations_b[i]))
+
+class TestWrapMean(unittest.TestCase):
+    """Test class for wrap_mean."""
+
+    def test_standard(self):
+        """Testing if functions work."""
+        array = np.array([359.2, 359, 358.3, 1, 2, 1.2])
+        self.assertAlmostEqual(pu.wrap_mean(array), 0.11666666666666665)
+
 
 if __name__ == '__main__':
     unittest.main()

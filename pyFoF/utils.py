@@ -24,3 +24,22 @@ def calculate_angular_seperation(long_a, lat_a, long_b, lat_b):
     denominator = sin_lat_a * sin_lat_b + cos_lat_a * cos_lat_b * cos_difference_long
 
     return np.arctan2(np.hypot(num1, num2), denominator)/faq
+
+def wrap_mean(array):
+    """Works out the mean location taking into account mean of 359 and 1 is 0."""
+    if (np.max(array)-np.min(array)>=180) and len(np.where((array>90) & (array<270))[0])==0:
+        left=[]
+        right=[]
+        for k in array:
+            if k<180:
+                right.append(k)
+            else:
+                left.append(k)
+        left_avg=np.mean(left)-360
+        right_avg=np.mean(right)
+        avg=np.mean([left_avg,right_avg])
+        if avg<0:
+            avg+=360
+    else:
+        avg=np.mean(array)
+    return avg
