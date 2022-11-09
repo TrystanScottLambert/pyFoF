@@ -57,8 +57,14 @@ class TestIntegrate(unittest.TestCase):
 
     def test_integrate(self):
         """testing if integrate works."""
-        scipy_integral, _ = quad(np.sin, -np.pi, np.pi/4)
-        self.assertAlmostEqual(scipy_integral, pu.integrate(-np.pi, np.pi/4, np.sin))
+        def func(x):
+            """Simple test function."""
+            return x*2 + x + 7
+        functions = [np.sin, np.cos, func]
+        for _function in functions:
+            scipy_integral, _ = quad(_function, -np.pi, np.pi/4)
+            self.assertAlmostEqual(scipy_integral, pu.integrate(-np.pi, np.pi/4, _function),
+                                    places = 4)
 
 if __name__ == '__main__':
     unittest.main()

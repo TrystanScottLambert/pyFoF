@@ -46,7 +46,7 @@ def wrap_mean(array):
 
 def integrate(lower_bound,upper_bound,function):
     """Simple integration method which is faster than the numpy methods."""
-    d_x = 1e-7
+    d_x = 1e-5
     x_values = np.arange(lower_bound, upper_bound, d_x)
     y_values = function(x_values)
     ysum = np.sum(y_values)
