@@ -5,6 +5,7 @@ import unittest
 import astropy.units as u
 import numpy as np
 from astropy.coordinates import SkyCoord
+from scipy.integrate import quad
 sys.path.append("../")
 from pyFoF import utils as pu
 
@@ -51,6 +52,13 @@ class TestWrapMean(unittest.TestCase):
         array = np.array([359.2, 359, 358.3, 1, 2, 1.2])
         self.assertAlmostEqual(pu.wrap_mean(array), 0.11666666666666665)
 
+class TestIntegrate(unittest.TestCase):
+    """Test class for integrate function."""
+
+    def test_integrate(self):
+        """testing if integrate works."""
+        scipy_integral, _ = quad(np.sin, -np.pi, np.pi/4)
+        self.assertAlmostEqual(scipy_integral, pu.integrate(-np.pi, np.pi/4, np.sin))
 
 if __name__ == '__main__':
     unittest.main()
