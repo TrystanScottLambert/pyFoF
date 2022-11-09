@@ -3,6 +3,7 @@
 from astropy.table import Table
 import pandas as pd
 
+
 def read_in_fits_table(fits_table_name: str) -> pd.DataFrame:
     """reads in a fits table."""
     fits_table = Table.read(fits_table_name)
@@ -23,7 +24,9 @@ def _find_data_of_iaupac_data(readlines_object):
     """Finds the first index which isn't part of the header"""
     for i, line in enumerate(readlines_object):
         if line[0] not in ['#', '/', '|', '\\']:
-            return readlines_object[i:]
+            text_data = readlines_object[i:]
+            data = [row.split() for row in text_data]
+            return data
     return 'No Data Found!'
 
 def read_in_iaupac_table(iaupac_name: str):
@@ -32,17 +35,29 @@ def read_in_iaupac_table(iaupac_name: str):
         text = file.readlines()
     header = _read_header_from_iaupac_table(text)
     data = _find_data_of_iaupac_data(text)
-    return header, data
+    df = pd.DataFrame(data, columns = header)
+    return df
 
-
-
+EXTENSIONS = {
+    'fits': read_in_fits_table,
+    'tbl': read_in_iaupac_table,
+}
 
 
 def check_file_type(file_name: str) -> str:
     """Identifies the file extension and runs the correct reader."""
     extension = file_name.split('.')[-1]
+    return extension
+
+def read_data(file_name:str) -> pd.DataFrame:
+    ext = check_file_type(file_name)
+    df = EXTENSIONS[ext](file_name)
+    return df
+
 
 
 if __name__ == '__main__':
     INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Kids/Kids_S_hemispec_no_dupes_updated.tbl'
-    df = read_in_fits_table(INFILE)
+    INFILE_FITS = '/home/trystan/Desktop/Work/pyFoF/data/Kids/Kids_S_hemispec_no_dupes_updated.tbl'
+    df = read_data(INFILE)
+    df_fits = read_data(INFILE_FITS)
