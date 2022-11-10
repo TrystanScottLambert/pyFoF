@@ -10,8 +10,6 @@ def read_in_fits_table(fits_table_name: str) -> pd.DataFrame:
     pandas_df = fits_table.to_pandas()
     return pandas_df
 
-
-
 def _read_header_from_iaupac_table(readlines_object):
     """Finds the header and reads in those values as the variables"""
     for line in readlines_object:
