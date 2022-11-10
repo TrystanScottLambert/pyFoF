@@ -33,14 +33,13 @@ def read_in_iaupac_table(iaupac_name: str):
         text = file.readlines()
     header = _read_header_from_iaupac_table(text)
     data = _find_data_of_iaupac_data(text)
-    df = pd.DataFrame(data, columns = header)
-    return df
+    d_f = pd.DataFrame(data, columns = header)
+    return d_f
 
 EXTENSIONS = {
     'fits': read_in_fits_table,
     'tbl': read_in_iaupac_table,
 }
-
 
 def check_file_type(file_name: str) -> str:
     """Identifies the file extension and runs the correct reader."""
@@ -48,10 +47,10 @@ def check_file_type(file_name: str) -> str:
     return extension
 
 def read_data(file_name:str) -> pd.DataFrame:
+    """Reads in data of any type and returns a data frame."""
     ext = check_file_type(file_name)
-    df = EXTENSIONS[ext](file_name)
-    return df
-
+    d_f = EXTENSIONS[ext](file_name)
+    return d_f
 
 
 if __name__ == '__main__':
