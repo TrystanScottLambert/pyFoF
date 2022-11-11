@@ -38,7 +38,7 @@ class Survey:
         term_1 = 10**(0.4 * (self.alpha+1) * (self.m_star-magnitdues))
         term_2 = np.exp(-10**(0.4 * (self.m_star-magnitdues)))
         return constant * term_1 * term_2
-    
-    def M_12(self, v_avg):
+
+    def m_12(self, v_avg):
         """Works out average magnitude."""
         return self.apparent_magnitude_limit - 25 - 5*np.log10(v_avg/self.cosmology.H0)

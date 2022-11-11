@@ -1,6 +1,7 @@
 """Friends-of-friends core functions."""
 
 import numpy as np
+from scipy.integrate import quad
 from .survey import Survey
 from .utils import calculate_angular_seperation
 
@@ -14,11 +15,16 @@ class Trial:
     def find_friends_from_point(self, ra, dec, vel, data_frame):
         """Finds all the friends around a point (ra, dec, vel)"""
         velocity_df = data_frame[data_frame['vel'].between(vel - self.v0, vel + self.v0)]
-        vels = np.array(velocity_df['vel'])
-        ras = np.array(velocity_df['ra'])
-        decs = np.array(velocity_df['dec'])
+        vels = np.array(list(velocity_df['vel']))
+        ras = np.array(list(velocity_df['ra']))
+        decs = np.array(list(velocity_df['dec']))
 
         separations = calculate_angular_seperation(ra, dec, ras, decs)
         theta = (np.pi/180) * (separations/2)
-        v_average = (vel + vels)/2
-        D_12 = np.sin(theta) * (v_average/self.survey.H0)
+        v_averages = (vel + vels)/2
+        on_sky_distances_mpc = np.sin(theta) * (v_averages/self.survey.H0)
+
+        upper_limits = self.survey.m_12(v_averages)
+        numerator = quad(self.survey.shecter_function, -np.inf, upper_limits)
+        d_limits  = self.d_0 * (numerator/self.survey.integral)**(-1./3)
+        cut = np.where(on_sky_distances_mpc < d_limits)[0]
