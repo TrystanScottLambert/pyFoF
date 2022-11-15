@@ -5,7 +5,6 @@ import numpy as np
 from astropy.cosmology import FlatLambdaCDM
 from scipy.integrate import quad
 
-
 class Survey:
     """Class representing an individual survey."""
     def __init__(self, data: pd.DataFrame, cosmology: FlatLambdaCDM,
@@ -23,19 +22,20 @@ class Survey:
         self.alpha = alpha
         self.m_star = m_star
         self.phi_star = phi_star
-        self.integral = quad(self.shecter_function, -np.inf, self.absolute_mag_lim)
+        self.integral = quad(self.shecter_function, -100, self.absolute_mag_lim) # sun's apparent mag = -26.74 so if you're detecting something brighter, you fucked up.
 
     @property
     def absolute_mag_lim(self):
         """Absolute magnitude limit."""
         abs_mag_lim = self.apparent_magnitude_limit-25-5*np.log10(
-            self.fiducial_velocity / self.cosmology.H0)
+            self.fiducial_velocity / self.cosmology.H0.value)
         return abs_mag_lim
 
     def shecter_function(self, magnitdues):
         """Shecter Luminosity Function as proposed by Kochanek et al. (2001)."""
         constant = 0.4 * np.log(10) * self.phi_star
         term_1 = 10**(0.4 * (self.alpha+1) * (self.m_star-magnitdues))
+        print(0.4 * (self.m_star-magnitdues))
         term_2 = np.exp(-10**(0.4 * (self.m_star-magnitdues)))
         return constant * term_1 * term_2
 

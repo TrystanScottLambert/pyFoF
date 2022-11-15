@@ -55,6 +55,6 @@ def read_data(file_name:str) -> pd.DataFrame:
 
 if __name__ == '__main__':
     INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Kids/Kids_S_hemispec_no_dupes_updated.tbl'
-    INFILE_FITS = '/home/trystan/Desktop/Work/pyFoF/data/Kids/Kids_S_hemispec_no_dupes_updated.tbl'
+    INFILE_FITS = '/home/trystan/Desktop/Work/pyFoF/data/Kids/Kids_S_hemispec_no_dupes_updated.fits'
     df = read_data(INFILE)
     df_fits = read_data(INFILE_FITS)

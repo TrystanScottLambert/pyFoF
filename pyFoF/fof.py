@@ -2,8 +2,10 @@
 
 import numpy as np
 from scipy.integrate import quad
-from .survey import Survey
-from .utils import calculate_angular_seperation
+from survey import Survey
+from utils import calculate_angular_seperation
+from data import read_data
+from astropy.cosmology import FlatLambdaCDM
 
 class Trial:
     """Class of a single trial run."""
@@ -28,3 +30,10 @@ class Trial:
         numerator = quad(self.survey.shecter_function, -np.inf, upper_limits)
         d_limits  = self.d_0 * (numerator/self.survey.integral)**(-1./3)
         cut = np.where(on_sky_distances_mpc < d_limits)[0]
+        return cut
+
+if __name__ == '__main__':
+    INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Kids/Kids_S_hemispec_no_dupes_updated.tbl'
+    cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
+    data_frame = read_data(INFILE)
+    KIDS = Survey(data_frame, cosmo, 11.75)
