@@ -35,7 +35,6 @@ class Survey:
         """Shecter Luminosity Function as proposed by Kochanek et al. (2001)."""
         constant = 0.4 * np.log(10) * self.phi_star
         term_1 = 10**(0.4 * (self.alpha+1) * (self.m_star-magnitdues))
-        print(0.4 * (self.m_star-magnitdues))
         term_2 = np.exp(-10**(0.4 * (self.m_star-magnitdues)))
         return constant * term_1 * term_2
 
