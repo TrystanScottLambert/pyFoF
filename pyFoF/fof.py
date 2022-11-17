@@ -2,10 +2,10 @@
 
 import numpy as np
 from scipy.integrate import quad
+from astropy.cosmology import FlatLambdaCDM
 from survey import Survey
 from utils import calculate_angular_seperation
 from data import read_data
-from astropy.cosmology import FlatLambdaCDM
 
 class Trial:
     """Class of a single trial run."""
@@ -34,6 +34,9 @@ class Trial:
 
 if __name__ == '__main__':
     INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Kids/Kids_S_hemispec_no_dupes_updated.tbl'
+    INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Kids/WISE-SGP_redshifts_w1mags.fits'
     cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
     data_frame = read_data(INFILE)
     KIDS = Survey(data_frame, cosmo, 11.75)
+    test_run = Trial(KIDS, d_0=0.56, v_0=350.)
+    test_run.find_friends_from_point(350, -30, )
