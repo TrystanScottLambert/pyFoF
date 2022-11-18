@@ -39,4 +39,4 @@ if __name__ == '__main__':
     data_frame = read_data(INFILE)
     KIDS = Survey(data_frame, cosmo, 11.75)
     test_run = Trial(KIDS, d_0=0.56, v_0=350.)
-    test_run.find_friends_from_point(350, -30, )
+    #test_run.find_friends_from_point(350, -30, )

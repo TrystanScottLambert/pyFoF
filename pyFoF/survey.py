@@ -4,6 +4,9 @@ import pandas as pd
 import numpy as np
 from astropy.cosmology import FlatLambdaCDM
 from scipy.integrate import quad
+from astropy import constants as c
+from astropy import units as u
+
 
 class Survey:
     """Class representing an individual survey."""
@@ -41,3 +44,7 @@ class Survey:
     def m_12(self, v_avg):
         """Works out average magnitude."""
         return self.apparent_magnitude_limit - 25 - 5*np.log10(v_avg/self.cosmology.H0)
+
+    def convert_z_into_cz(self, z_column_name):
+        """Takes the z column and makes a redhsift column in km/s."""
+        self.data_frame['redshift'] = self.data_frame[z_column_name] * c.c.to(u.km/u.s).value
