@@ -4,8 +4,9 @@ import numpy as np
 from scipy.integrate import cumtrapz
 from astropy.cosmology import FlatLambdaCDM
 from survey import Survey
-from utils import calculate_angular_seperation
+from utils import calculate_angular_seperation, wrap_mean
 from data import read_data
+import pylab as plt
 
 
 class Trial:
@@ -40,7 +41,36 @@ class Trial:
         d_limits  = self.d_0 * (numerator/self.survey.integral[0])**(-1./3)
         cut = np.where(on_sky_distances_mpc < d_limits)[0]
         return cut
+    
+    def find_group(self, index):
+        """Will find the group starting from the indexed galaxy."""
+        ra = self.survey.data_frame['ra'].values
+        dec = self.survey.data_frame['dec'].values
+        vel = self.survey.data_frame['vel'].values
 
+        friends_after = self.find_friends_from_point(ra[index], dec[index], vel[index])
+
+        friends_before = np.array([])
+        iterations = 1
+        while friends_after != friends_before:
+            iterations += 1
+            print(iterations)
+            friends_before = friends_after
+            print(friends_before)
+            group_ra = wrap_mean(ra[friends_before])
+            group_dec = np.mean(dec[friends_before])
+            group_vel = np.mean(vel[friends_before])
+            fig = plt.figure()
+            ax = fig.add_subplot(projection='aitoff')
+            ax.scatter(group_ra, group_dec, marker = 's')
+            ax.scatter(ra[friends_before], dec[friends_before], color='r')
+            ax.scatter(ra, dec, s=0.1, color='k')
+            plt.show()
+
+            friends_after = self.find_friends_from_point(group_ra, group_dec, group_vel)
+            print(friends_after)
+            print()
+        return friends_after
 
 
 if __name__ == '__main__':
@@ -51,4 +81,5 @@ if __name__ == '__main__':
     KIDS = Survey(data, cosmo, 11.75)
     KIDS.convert_z_into_cz('zcmb')
     test_run = Trial(KIDS, d_0=0.56, v_0=350.)
-    test = test_run.find_friends_from_point(3.62163, -33.11417, 9080.713594990893)
+    #test = test_run.find_friends_from_point(3.62163, -33.11417, 9080.713594990893)
+    test = test_run.find_group(1)
