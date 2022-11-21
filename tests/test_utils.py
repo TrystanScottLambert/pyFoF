@@ -1,12 +1,10 @@
 """Tests for the Utils module."""
 
-import sys
 import unittest
 import astropy.units as u
 import numpy as np
 from astropy.coordinates import SkyCoord
 from scipy.integrate import quad
-#sys.path.append("../")
 from pyFoF import utils
 
 class TestAngSep(unittest.TestCase):

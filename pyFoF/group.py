@@ -1,6 +1,6 @@
 """Main group class."""
 
-import numpy as np 
+import numpy as np
 import pandas as pd
 from typing import Tuple
 from utils import wrap_mean
