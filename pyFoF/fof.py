@@ -74,11 +74,10 @@ class Trial:
             group_ra, group_dec, group_vel,self.ra[members],
             self.dec[members], self.vel[members])
         line_of_sight_distances = np.abs(group_vel - self.vel[members])
-
         on_sky_cut = np.where(projected_separations <= self.d_max)[0]
         line_of_sight_cut = np.where(line_of_sight_distances <= self.v_max)[0]
         galaxies_in_max_limits = np.intersect1d(on_sky_cut, line_of_sight_cut)
-        return galaxies_in_max_limits
+        return members[galaxies_in_max_limits]
 
     def find_group(self, index):
         """Will find the group starting from the indexed galaxy."""
@@ -89,12 +88,14 @@ class Trial:
         iterations = 0
         while np.array_equal(friends_after, friends_before) is False:
             iterations += 1
-            friends_before = self._remove_outlying_members(friends_after)
-            print(f'what happens after removal: {friends_before}')
+            friends_before = friends_after
             friends_after = np.unique(np.concatenate([self.find_friends_of_galaxy(friend) for friend in friends_before]))
-            print(iterations, friends_before, friends_after)
+            friends_after = self._remove_outlying_members(friends_after)
         return friends_after
-
+    
+    def run(self):
+        """Run one friends-of-friends trial."""
+        checked = np.zeros(len(self.survey.data_frame))
 
 if __name__ == '__main__':
     INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Kids/Kids_S_hemispec_no_dupes_updated.tbl'
