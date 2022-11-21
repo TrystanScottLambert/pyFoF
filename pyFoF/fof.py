@@ -25,6 +25,14 @@ class Trial:
         self.vel = self.survey.data_frame['vel'].values
         self.mag = self.survey.data_frame['W1'].values
 
+    def _calculate_projected_separations(self, ra, dec, vel, ras, decs, vels):
+        """Works out the projected distances in Mpc (as apoosed to arcseconds)."""
+        separations = calculate_angular_seperation(ra, dec, ras, decs)
+        theta = (np.pi/180) * (separations/2)
+        v_averages = (vel + vels)/2
+        on_sky_distances_mpc = np.sin(theta) * (v_averages/self.survey.cosmology.H0.value)
+        return on_sky_distances_mpc
+
     def find_friends_from_point(self, ra: float, dec: float, vel: float) -> np.ndarray:
         """Finds all the friends around a point (ra, dec, vel)"""
         data_frame = self.survey.data_frame
@@ -32,12 +40,9 @@ class Trial:
         vels = velocity_df['vel'].values
         ras = velocity_df['ra'].values
         decs = velocity_df['dec'].values
-
-        separations = calculate_angular_seperation(ra, dec, ras, decs)
-        theta = (np.pi/180) * (separations/2)
+        
+        on_sky_distances_mpc = self._calculate_projected_separations(ra, dec, vel, ras, decs, vels)
         v_averages = (vel + vels)/2
-        on_sky_distances_mpc = np.sin(theta) * (v_averages/self.survey.cosmology.H0.value)
-
         upper_limits = self.survey.m_12(v_averages)
         upper_limits_sort = np.sort(upper_limits)
         arg = upper_limits.argsort()
@@ -64,53 +69,41 @@ class Trial:
         group_ra = wrap_mean(self.ra[members])
         group_dec = np.mean(self.dec[members])
         group_vel = np.mean(self.vel[members])
-        separations = calculate_angular_seperation(group_ra, group_dec, 
-                                                   self.ra[members], self.dec[members])
+
+        projected_separations = self._calculate_projected_separations(
+            group_ra, group_dec, group_vel,self.ra[members],
+            self.dec[members], self.vel[members])
         line_of_sight_distances = np.abs(group_vel - self.vel[members])
-        on_sky_cut = np.where(separations <= self.d_max)[0]
+
+        on_sky_cut = np.where(projected_separations <= self.d_max)[0]
         line_of_sight_cut = np.where(line_of_sight_distances <= self.v_max)[0]
         galaxies_in_max_limits = np.intersect1d(on_sky_cut, line_of_sight_cut)
         return galaxies_in_max_limits
 
     def find_group(self, index):
         """Will find the group starting from the indexed galaxy."""
-        ra = self.survey.data_frame['ra'].values
-        dec = self.survey.data_frame['dec'].values
-        vel = self.survey.data_frame['vel'].values
 
-        friends_after = self.find_friends_from_point(ra[index], dec[index], vel[index])
+        friends_after = self.find_friends_of_galaxy(index)
         friends_before = np.array([])
 
-        iterations = 1
-        while friends_after != friends_before:
+        iterations = 0
+        while np.array_equal(friends_after, friends_before) is False:
             iterations += 1
-            print(iterations)
             friends_before = self._remove_outlying_members(friends_after)
-            print(friends_before)
-
-            group_ra = wrap_mean(ra[friends_before])
-            group_dec = np.mean(dec[friends_before])
-            group_vel = np.mean(vel[friends_before])
-            fig = plt.figure()
-            ax = fig.add_subplot(projection='aitoff')
-            ax.scatter(group_ra, group_dec, marker = 's')
-            ax.scatter(ra[friends_before], dec[friends_before], color='r')
-            ax.scatter(ra, dec, s=0.1, color='k')
-            plt.show()
-
-            friends_after = np.concatenate([self.find_friends_of_galaxy(friend) for friend in friends_before])
-            print(friends_after)
-            print()
+            print(f'what happens after removal: {friends_before}')
+            friends_after = np.unique(np.concatenate([self.find_friends_of_galaxy(friend) for friend in friends_before]))
+            print(iterations, friends_before, friends_after)
         return friends_after
 
 
 if __name__ == '__main__':
     INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Kids/Kids_S_hemispec_no_dupes_updated.tbl'
     INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Kids/WISE-SGP_redshifts_w1mags.tbl'
+    #INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Test_Data/Test_Cat.tbl'
     cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
     data = read_data(INFILE)
     KIDS = Survey(data, cosmo, 11.75)
     KIDS.convert_z_into_cz('zcmb')
-    test_run = Trial(KIDS, d_0=0.56, v_0=350., v_max = 1000., d_max = 2.0)
+    test_run = Trial(KIDS, d_0=0.56, v_0=350., v_max = 1500., d_max = 2.0)
     test = test_run.find_friends_from_point(3.62163, -33.11417, 9080.713594990893)
-    #test = test_run.find_group(1)
+    test = test_run.find_group(1)

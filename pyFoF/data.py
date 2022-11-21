@@ -50,9 +50,15 @@ def auto_convert_df_types(data_frame: pd.DataFrame) -> pd.DataFrame:
     """Automatically assigns types to a data frame."""
     for col in data_frame.columns:
         try:
-            data_frame[col] = data_frame[col].astype(float)
+            data_frame[col] = data_frame[col].astype(int)
         except ValueError:
-            pass
+            try:
+                data_frame[col] = data_frame[col].astype(float)
+            except ValueError:
+                try:
+                    data_frame[col] = data_frame[col].astype(str)
+                except ValueError:
+                    pass
     return data_frame
 
 def read_data(file_name:str) -> pd.DataFrame:
