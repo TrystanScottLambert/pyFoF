@@ -46,15 +46,26 @@ def check_file_type(file_name: str) -> str:
     extension = file_name.split('.')[-1]
     return extension
 
+def auto_convert_df_types(data_frame: pd.DataFrame) -> pd.DataFrame:
+    """Automatically assigns types to a data frame."""
+    for col in data_frame.columns:
+        try:
+            data_frame[col] = data_frame[col].astype(float)
+        except ValueError:
+            pass
+    return data_frame
+
 def read_data(file_name:str) -> pd.DataFrame:
     """Reads in data of any type and returns a data frame."""
     ext = check_file_type(file_name)
     d_f = EXTENSIONS[ext](file_name)
+    d_f = auto_convert_df_types(d_f)
     return d_f
 
 
 if __name__ == '__main__':
-    INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Kids/Kids_S_hemispec_no_dupes_updated.tbl'
-    INFILE_FITS = '/home/trystan/Desktop/Work/pyFoF/data/Kids/Kids_S_hemispec_no_dupes_updated.fits'
+    INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Kids/WISE-SGP_redshifts_w1mags.tbl'
+    INFILE_FITS = '/home/trystan/Desktop/Work/pyFoF/data/Kids/WISE-SGP_redshifts_w1mags.fits'
+
     df = read_data(INFILE)
     df_fits = read_data(INFILE_FITS)

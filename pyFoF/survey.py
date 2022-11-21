@@ -3,9 +3,9 @@
 import pandas as pd
 import numpy as np
 from astropy.cosmology import FlatLambdaCDM
-from scipy.integrate import quad
 from astropy import constants as c
 from astropy import units as u
+from scipy.integrate import quad
 
 
 class Survey:
@@ -25,7 +25,10 @@ class Survey:
         self.alpha = alpha
         self.m_star = m_star
         self.phi_star = phi_star
-        self.integral = quad(self.shecter_function, -100, self.absolute_mag_lim) # sun's apparent mag = -26.74 so if you're detecting something brighter, you fucked up.
+        self.integral = quad(
+            self.shecter_function, -100, self.absolute_mag_lim
+            ) # sun's apparent mag = -26.74 so if you're detecting something brighter, you fucked up.
+        self._add_idx_information_to_df()
 
     @property
     def absolute_mag_lim(self):
@@ -43,8 +46,13 @@ class Survey:
 
     def m_12(self, v_avg):
         """Works out average magnitude."""
-        return np.array(self.apparent_magnitude_limit - 25 - 5*np.log10(v_avg/self.cosmology.H0.value))
+        return np.array(
+            self.apparent_magnitude_limit - 25 - 5*np.log10(v_avg/self.cosmology.H0.value))
 
     def convert_z_into_cz(self, z_column_name):
         """Takes the z column and makes a redhsift column in km/s."""
         self.data_frame['vel'] = self.data_frame[z_column_name] * c.c.to(u.km/u.s).value
+    
+    def _add_idx_information_to_df(self):
+        """Adds necessary id information which will be used by other classes."""
+        self.data_frame['fof_ids'] = np.arange(len(self.data_frame))
