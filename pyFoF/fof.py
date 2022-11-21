@@ -106,13 +106,10 @@ class Trial:
 
 if __name__ == '__main__':
     INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Kids/Kids_S_hemispec_no_dupes_updated.tbl'
-    INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Kids/WISE-SGP_redshifts_w1mags.fits'
-    INFILE_TEST = '/home/trystan/Desktop/Work/pyFoF/data/Kids/test_poes.tbl'
+    INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Kids/WISE-SGP_redshifts_w1mags.tbl'
     cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
     data = read_data(INFILE)
     KIDS = Survey(data, cosmo, 11.75)
-    more_data = read_data(INFILE_TEST)
-    KIDS_TEST = Survey(more_data, cosmo, 11.75)
     KIDS.convert_z_into_cz('zcmb')
     test_run = Trial(KIDS, d_0=0.56, v_0=350., v_max = 1000., d_max = 2.0)
     test = test_run.find_friends_from_point(3.62163, -33.11417, 9080.713594990893)

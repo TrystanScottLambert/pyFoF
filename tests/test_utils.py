@@ -6,8 +6,8 @@ import astropy.units as u
 import numpy as np
 from astropy.coordinates import SkyCoord
 from scipy.integrate import quad
-sys.path.append("../")
-from pyFoF import utils as pu
+#sys.path.append("../")
+from pyFoF import utils
 
 class TestAngSep(unittest.TestCase):
     """Test class for calculate_angular_separation."""
@@ -19,7 +19,7 @@ class TestAngSep(unittest.TestCase):
         declinations_a = np.arcsin(np.random.random(number_of_points)*2 - 1)
         right_ascentions_b = (np.random.random(number_of_points) * 2 * np.pi) * (180./np.pi)
         declinations_b = np.arcsin(np.random.random(number_of_points)*2 - 1)
-        angsep_distances = pu.calculate_angular_seperation(
+        angsep_distances = utils.calculate_angular_seperation(
             right_ascentions_a, declinations_a, right_ascentions_b, declinations_b)
 
         c_a = SkyCoord(ra = right_ascentions_a * u.deg, dec = declinations_a * u.deg)
@@ -41,7 +41,7 @@ class TestAngSep(unittest.TestCase):
             c_a = SkyCoord(ra = right_ascentions_a[i] * u.deg, dec = declinations_a[i] * u.deg)
             c_b = SkyCoord(ra = right_ascentions_b[i] * u.deg, dec = declinations_b[i] * u.deg)
             sep = c_a.separation(c_b)
-            self.assertAlmostEqual(sep.value, pu.calculate_angular_seperation(
+            self.assertAlmostEqual(sep.value, utils.calculate_angular_seperation(
                 right_ascentions_a[i], declinations_a[i], right_ascentions_b[i], declinations_b[i]))
 
 class TestWrapMean(unittest.TestCase):
@@ -50,7 +50,7 @@ class TestWrapMean(unittest.TestCase):
     def test_standard(self):
         """Testing if functions work."""
         array = np.array([359.2, 359, 358.3, 1, 2, 1.2])
-        self.assertAlmostEqual(pu.wrap_mean(array), 0.11666666666666665)
+        self.assertAlmostEqual(utils.wrap_mean(array), 0.11666666666666665)
 
 class TestIntegrate(unittest.TestCase):
     """Test class for integrate function."""
@@ -63,7 +63,7 @@ class TestIntegrate(unittest.TestCase):
         functions = [np.sin, np.cos, func]
         for _function in functions:
             scipy_integral, _ = quad(_function, -np.pi, np.pi/4)
-            self.assertAlmostEqual(scipy_integral, pu.integrate(-np.pi, np.pi/4, _function),
+            self.assertAlmostEqual(scipy_integral, utils.integrate(-np.pi, np.pi/4, _function),
                                     places = 4)
 
 if __name__ == '__main__':
