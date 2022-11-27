@@ -1,0 +1,6 @@
+.vscode
+.vscode/*
+tests/__pycache__
+tests/__pycache__/*
+pyFoF/__pycache__
+pyFoF/__pycache__/*
