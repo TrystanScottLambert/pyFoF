@@ -3,6 +3,7 @@
 import numpy as np
 from scipy.integrate import cumtrapz
 from astropy.cosmology import FlatLambdaCDM
+from rich.progress import Progress
 from survey import Survey
 from utils import calculate_angular_seperation, wrap_mean
 from data import read_data
@@ -104,12 +105,15 @@ class Trial:
         checked = np.zeros(len(self.survey.data_frame))
         galaxies_left = np.where(checked == 0)[0]
         groups = []
-        while len(galaxies_left) > 0:
-            new_group = self.find_group(np.random.choice(galaxies_left), galaxies_left)
-            groups.append(Group(new_group))
-            checked[new_group] = 1
-            galaxies_left = np.where(checked == 0)[0]
-            print(f'{round(100*(1 - len(galaxies_left)/len(checked)),2)} %')
+
+        with Progress() as progress:
+            task = progress.add_task(f'Finding groups with d0 = {self.d_0} and v0 = {self.v_0} ', total=len(checked))
+            while len(galaxies_left) > 0:
+                new_group = self.find_group(np.random.choice(galaxies_left), galaxies_left)
+                groups.append(Group(new_group))
+                checked[new_group] = 1
+                galaxies_left = np.where(checked == 0)[0]
+                progress.update(task, advance = len(new_group))
         return groups
 
 
