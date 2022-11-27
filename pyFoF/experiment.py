@@ -24,7 +24,9 @@ class Run:
         """Runs the algorithm."""
         results = [
             Trial(
-                self.survey, self.d0s[i], self.v0s[i], v_max = self.v_max, d_max = self.d_max
+                self.survey, {
+                    "d_0": self.d0s[i], "v_0": self.v0s[i], "v_max": self.v_max, "d_max": self.d_max
+                    }
                 ).run() for i in range(self.number_of_trials)
             ]
         return results
