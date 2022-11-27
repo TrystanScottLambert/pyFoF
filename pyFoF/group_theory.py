@@ -39,8 +39,8 @@ def get_edges(results_list: List, n_runs: int) -> Tuple[np.ndarray, np.ndarray, 
             number_of_instances = float(len(val))
             percentage_of_instances = number_of_instances/n_runs
             weights.append(percentage_of_instances)
-            edges_x.append(edges_x[i])
-            edges_y.append(edges_y[i])
+            edges_x.append(_edges_x[i])
+            edges_y.append(_edges_y[i])
     return edges_x, edges_y, weights
 
 def get_nodes(results_list: List):
@@ -120,7 +120,7 @@ def wc_list(graph_list: List[nx.Graph]) -> Tuple[np.ndarray, np.ndarray]:
 
 def ranking_edges(graph):
     """Getting ranking of edges?"""
-    return np.unqique(np.sort(get_edges_arrays([graph])))
+    return np.unique(np.sort(get_edges_arrays([graph])))
 
 def sub_groups(graph: nx.Graph) -> List[nx.Graph]:
     """I don't know what this is doing."""

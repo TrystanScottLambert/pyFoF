@@ -5,6 +5,7 @@ from astropy.cosmology import FlatLambdaCDM
 from data import read_data
 from survey import Survey
 from fof import Trial
+from group_theory import stabalize
 
 class Run:
     """Class for one run of the modern algorithm."""
@@ -38,4 +39,7 @@ if __name__ == '__main__':
     KIDS = Survey(data, cosmo, 11.75)
     KIDS.convert_z_into_cz('zcmb')
     test_run = Run(0.3, 0.6, 300, 400, 2., 1000., 3, KIDS)
-    thing = test_run.run()
+    groups = test_run.run()
+    groups = np.concatenate(groups)
+    run_result = [group.members for group in groups]
+    stabalize(run_result, 0.5, 3)
