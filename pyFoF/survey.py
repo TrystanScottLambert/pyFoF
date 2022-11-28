@@ -25,9 +25,7 @@ class Survey:
         self.alpha = alpha
         self.m_star = m_star
         self.phi_star = phi_star
-        self.integral = quad(
-            self.shecter_function, -100, self.absolute_mag_lim
-            ) # sun's apparent mag = -26.74 so if you're detecting something brighter, you fucked up.
+        self.integral = quad(self.shecter_function, -100, self.absolute_mag_lim) # sun's apparent mag = -26.74 so if you're detecting something brighter, you fucked up.
         self._add_idx_information_to_df()
 
     @property
@@ -52,7 +50,11 @@ class Survey:
     def convert_z_into_cz(self, z_column_name):
         """Takes the z column and makes a redhsift column in km/s."""
         self.data_frame['vel'] = self.data_frame[z_column_name] * c.c.to(u.km/u.s).value
-    
+
+    def make_mag_colum(self, mag_column_name):
+        """Copies the magnitude column and changes it into the needed keyword 'mag' """
+        self.data_frame['mag'] = self.data_frame[mag_column_name]
+
     def _add_idx_information_to_df(self):
         """Adds necessary id information which will be used by other classes."""
         self.data_frame['fof_ids'] = np.arange(len(self.data_frame))

@@ -6,6 +6,7 @@ from data import read_data
 from survey import Survey
 from fof import Trial
 from group_theory import stabalize
+from group import Group
 
 class Experiment:
     """Class for one run of the modern algorithm."""
@@ -20,11 +21,15 @@ class Experiment:
         self.survey = survey
         self.number_of_trials = n_trials
         members = self.run()
-        group_theory_data = stabalize(members, cutoff, n_trials )
-        self.stable_arrays  = group_theory_data[0]
+        group_theory_data = stabalize(members, cutoff, n_trials)
+        self.groups = [
+            Group(
+                member_data, self.survey, weights=group_theory_data[3]
+                ) for member_data in group_theory_data[0]]
+        #self.stable_arrays  = group_theory_data[0]
         self.edge_data = group_theory_data[1]
-        self.weights = group_theory_data[2]
-        self.weights_normed = group_theory_data[3]
+        #self.weights = group_theory_data[2]
+        #self.weights_normed = group_theory_data[3]
 
     def run(self):
         """Runs the algorithm."""
@@ -48,6 +53,7 @@ if __name__ == '__main__':
     data = read_data(INFILE)
     KIDS = Survey(data, cosmo, 11.75)
     KIDS.convert_z_into_cz('zcmb')
+    KIDS.make_mag_colum('W1')
     test_run = Experiment(
         d0_initial=0.3, d0_final=0.6,
         v0_initial=100, v0_final=400,

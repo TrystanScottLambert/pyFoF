@@ -12,7 +12,6 @@ from survey import Survey
 from utils import calculate_angular_seperation, wrap_mean
 from data import read_data
 from group import Group
-import datetime
 
 
 class FoFArgs(TypedDict):
@@ -39,7 +38,7 @@ class BaseFoF(ABC):
         self.right_ascension = self.survey.data_frame['ra'].values
         self.dec = self.survey.data_frame['dec'].values
         self.vel = self.survey.data_frame['vel'].values
-        self.mag = self.survey.data_frame['W1'].values
+        self.mag = self.survey.data_frame['mag'].values
 
     @staticmethod
     def _calculate_projected_separations(right_ascension, dec, vel, ras, decs, vels, h0_value):
@@ -162,7 +161,7 @@ class ClassicFoF(BaseFoF):
                 )
             while len(galaxies_left) > 0:
                 new_group = self._find_group(np.random.choice(galaxies_left), galaxies_left)
-                groups.append(Group(new_group))
+                groups.append(Group(new_group, self.survey))
                 checked[new_group] = 1
                 galaxies_left = np.where(checked == 0)[0]
                 progress.update(task, advance = len(new_group))
@@ -229,6 +228,7 @@ if __name__ == '__main__':
     data = read_data(INFILE)
     KIDS = Survey(data, cosmo, 11.75)
     KIDS.convert_z_into_cz('zcmb')
+    KIDS.make_mag_colum('W1')
     my_fof_args: FoFArgs = {"d_0": 0.56, "v_0": 350., "v_max": 1500., "d_max": 2.0}
     test_run = Trial(KIDS, my_fof_args)
     test = test_run.run()
