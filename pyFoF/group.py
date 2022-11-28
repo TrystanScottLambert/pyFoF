@@ -1,6 +1,5 @@
 """Main group class."""
 
-from typing import Tuple
 import numpy as np
 import pylab as plt
 import astropy.units as u
@@ -17,10 +16,10 @@ class Group:
         self.number_of_members = len(self.members)
         self.weights = weights
         self.survey = survey
-        self.calculate_positional_data()
+        self.calculate_positional_properties()
+        self.velocity_dispersion = np.std(self.survey.data_frame['vel'][self.members])
 
-
-    def calculate_positional_data(self) -> None:
+    def calculate_positional_properties(self) -> None:
         """returns the position of the group"""
         self.ra = wrap_mean(self.survey.data_frame['ra'][self.members])
         self.dec = np.mean(self.survey.data_frame['dec'][self.members])
