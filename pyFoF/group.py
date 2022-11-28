@@ -24,17 +24,19 @@ class Group:
         self.ra = wrap_mean(self.survey.data_frame['ra'][self.members])
         self.dec = np.mean(self.survey.data_frame['dec'][self.members])
         self.vel = np.mean(self.survey.data_frame['vel'][self.members])
+        self.redshift = self.vel / constants.c.to(u.km/u.s).value
+        self.luminosity_distance = self.survey.cosmology.luminosity_distance(self.redshift).value
+        self.comoving_distance = self.survey.cosmology.comoving_distance(self.redshift).value
 
-        coords = SkyCoord(ra = self.ra * u.deg, dec = self.dec * u.deg)
+
+        coords = SkyCoord(
+            ra = self.ra * u.deg, dec = self.dec * u.deg, distance = self.luminosity_distance*u.Mpc)
         self.galactic_l = coords.galactic.l.value
         self.galactic_b = coords.galactic.b.value
         self.equi_x = coords.cartesian.x.value
         self.equi_y = coords.cartesian.y.value
         self.equi_z = coords.cartesian.z.value
 
-        self.redshift = self.vel / constants.c.to(u.km/u.s).value
-        self.luminosity_distance = self.survey.cosmology.luminosity_distance(self.redshift).value
-        self.comoving_distance = self.survey.cosmology.comoving_distance(self.redshift).value
 
     def quicklook(self):
         """Quickly shows what the groups look like and that they are correct."""
