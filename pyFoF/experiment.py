@@ -2,7 +2,7 @@
 
 import numpy as np
 from astropy.cosmology import FlatLambdaCDM
-from io import read_data
+from data_handling import read_data
 from survey import Survey
 from fof import Trial
 from group_theory import stabalize
@@ -48,7 +48,7 @@ class Experiment:
 if __name__ == '__main__':
     INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Kids/Kids_S_hemispec_no_dupes_updated.tbl'
     INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Kids/WISE-SGP_redshifts_w1mags.tbl'
-    #INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Test_Data/Test_Cat.tbl'
+    INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Test_Data/Test_Cat.tbl'
     cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
     data = read_data(INFILE)
     KIDS = Survey(data, cosmo, 11.75)

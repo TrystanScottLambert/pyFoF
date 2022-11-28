@@ -25,8 +25,8 @@ class Group:
         self.dec = np.mean(self.survey.data_frame['dec'][self.members])
         self.vel = np.mean(self.survey.data_frame['vel'][self.members])
         self.redshift = self.vel / constants.c.to(u.km/u.s).value
-        self.luminosity_distance = self.survey.cosmology.luminosity_distance(self.redshift).value
         self.comoving_distance = self.survey.cosmology.comoving_distance(self.redshift).value
+        self.luminosity_distance = self.survey.cosmology.luminosity_distance(self.redshift).value
 
         coords = SkyCoord(
             ra = self.ra * u.deg, dec = self.dec * u.deg, distance = self.luminosity_distance*u.Mpc)
@@ -35,7 +35,6 @@ class Group:
         self.equi_x = coords.cartesian.x.value
         self.equi_y = coords.cartesian.y.value
         self.equi_z = coords.cartesian.z.value
-
 
     def quicklook(self):
         """Quickly shows what the groups look like and that they are correct."""
@@ -50,7 +49,7 @@ class Group:
         ax1 = fig.add_subplot(212)
         ax1.scatter(
             self.survey.data_frame['vel'][self.members],
-            self.survey.data_frame['dec'][self.members], 
+            self.survey.data_frame['dec'][self.members],
             s = 3, c = 'k')
         ax1.set_xlabel('Vel', fontsize = 13)
         ax1.set_ylabel('Dec', fontsize = 13)

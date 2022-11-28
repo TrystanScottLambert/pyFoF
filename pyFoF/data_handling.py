@@ -70,9 +70,6 @@ def read_data(file_name:str) -> pd.DataFrame:
     d_f = auto_convert_df_types(d_f)
     return d_f
 
-def generate_group_cat(group_list: List[Group]):
-    
-
 if __name__ == '__main__':
     INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Kids/WISE-SGP_redshifts_w1mags.tbl'
     INFILE_FITS = '/home/trystan/Desktop/Work/pyFoF/data/Kids/WISE-SGP_redshifts_w1mags.fits'

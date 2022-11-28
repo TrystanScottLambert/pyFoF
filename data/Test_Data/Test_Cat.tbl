@@ -1,7 +1,7 @@
 \ WISE-SGP catalogue;  redshifts and W1 mag (vega)
 \  zhelio to zcmb using H0 = 70, omega_m = 0.3
 \  jarrett & cluver 2022
-|    idname            |   ra    |    dec  |  zcmb  |  zhelio|  W1   |  eW1  |
+|    idname            |   ra    |    dec  |  zcmb  |  zhelio|  mag   |  eW1  |
 |    char              |    r    |     r   |    r   |    r   |   r   |   r   |
  94967_group1             3.62163 -33.11417  0.03029  0.03120  15.275   0.056
  94976_group1             3.62164 -33.11418  0.03029  0.05880  14.542   0.034

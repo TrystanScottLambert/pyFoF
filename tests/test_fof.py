@@ -4,7 +4,7 @@ import unittest
 import numpy as np
 from astropy.cosmology import FlatLambdaCDM
 from pyFoF import fof
-from pyFoF import io
+from pyFoF import data_handling
 from pyFoF import survey
 
 
@@ -15,7 +15,7 @@ class TestFindingFriends(unittest.TestCase):
         """Checking if two points will be found as friends."""
         infile = './data/Test_Data/Test_Cat.tbl'
         cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
-        my_data = io.read_data(infile)
+        my_data = data_handling.read_data(infile)
         test_survey = survey.Survey(my_data, cosmo, 11.75)
         test_survey.convert_z_into_cz('zcmb')
         fof_args: fof.FoFArgs = {'d_0':0.56, 'v_0':350., 'v_max': 1000., 'd_max': 2.0}
@@ -32,7 +32,7 @@ class TestFindingFriends(unittest.TestCase):
         """Looking for friends around a galaxy which is completely isolated."""
         infile = './data/Test_Data/Test_Cat.tbl'
         cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
-        my_data = io.read_data(infile)
+        my_data = data_handling.read_data(infile)
         test_survey = survey.Survey(my_data, cosmo, 11.75)
         test_survey.convert_z_into_cz('zcmb')
         fof_args: fof.FoFArgs = {'d_0':0.56, 'v_0':350., 'v_max': 1000., 'd_max': 2.0}
@@ -51,7 +51,7 @@ class TestFindingFriends(unittest.TestCase):
         """Finding friends and checking that indicies are correct"""
         infile = './data/Test_Data/Test_Cat.tbl'
         cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
-        my_data = io.read_data(infile)
+        my_data = data_handling.read_data(infile)
         test_survey = survey.Survey(my_data, cosmo, 11.75)
         test_survey.convert_z_into_cz('zcmb')
         fof_args: fof.FoFArgs = {'d_0':0.56, 'v_0':350., 'v_max': 1000., 'd_max': 2.0}
@@ -68,7 +68,7 @@ class TestFindingFriends(unittest.TestCase):
         """Checking that the checking array is working."""
         infile = './data/Test_Data/Test_Cat.tbl'
         cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
-        my_data = io.read_data(infile)
+        my_data = data_handling.read_data(infile)
         test_survey = survey.Survey(my_data, cosmo, 11.75)
         test_survey.convert_z_into_cz('zcmb')
         fof_args: fof.FoFArgs = {'d_0':0.56, 'v_0':350., 'v_max': 1000., 'd_max': 2.0}
