@@ -2,7 +2,7 @@
 
 import numpy as np
 from astropy.cosmology import FlatLambdaCDM
-from data import read_data
+from io import read_data
 from survey import Survey
 from fof import Trial
 from group_theory import stabalize

@@ -1,7 +1,9 @@
 """Data class to handle inputs and outputs."""
 
+from typing import List
 from astropy.table import Table
 import pandas as pd
+from group import Group
 
 
 def read_in_fits_table(fits_table_name: str) -> pd.DataFrame:
@@ -68,6 +70,8 @@ def read_data(file_name:str) -> pd.DataFrame:
     d_f = auto_convert_df_types(d_f)
     return d_f
 
+def generate_group_cat(group_list: List[Group]):
+    
 
 if __name__ == '__main__':
     INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Kids/WISE-SGP_redshifts_w1mags.tbl'
