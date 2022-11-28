@@ -1,10 +1,7 @@
 """Data class to handle inputs and outputs."""
 
-from typing import List
 from astropy.table import Table
 import pandas as pd
-from group import Group
-
 
 def read_in_fits_table(fits_table_name: str) -> pd.DataFrame:
     """reads in a fits table."""

@@ -13,11 +13,11 @@ class Group:
     def __init__(self, members: np.ndarray, survey: Survey, weights: np.ndarray = None) -> None:
         """initializing"""
         self.members = members
-        self.number_of_members = len(self.members)
         self.weights = weights
         self.survey = survey
         self.calculate_positional_properties()
         self.velocity_dispersion = np.std(self.survey.data_frame['vel'][self.members])
+        self.number_of_members = len(self.members)
 
     def calculate_positional_properties(self) -> None:
         """returns the position of the group"""
