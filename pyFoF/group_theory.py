@@ -52,13 +52,11 @@ def generate_main_graph(results_list: List, n_runs: int) -> nx.Graph:
 
 def get_subgraphs(graph: nx.Graph):
     """finds all the subgraphs in a graph object."""
-    #print('Identifying Subgraphs:')
     sub_graphs = list(graph.subgraph(c).copy() for c in nx.connected_components(graph))
     return sub_graphs
 
 def find_proper_groups(sub_graph_list: List[nx.Graph]) -> List[nx.Graph]:
     """Remove any pairings have less than 3 members. (i.e. not groups.)"""
-    #print('Applying > 2 condition for groups.')
     return [sub_graph for sub_graph in sub_graph_list if len(sub_graph.nodes) > 2]
 
 def get_node_arrays(stable_list):
@@ -67,7 +65,6 @@ def get_node_arrays(stable_list):
 
 def get_edges_arrays(stable_list: List[nx.Graph]) -> np.ndarray[List]:
     """Writing the edges as arrays"""
-    #print('Getting Edge Data')
     edges_array=[]
     for stable_graph in stable_list:
         local_edges_full = nx.get_edge_attributes(stable_graph,'weight')
