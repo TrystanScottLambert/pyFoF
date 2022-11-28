@@ -85,7 +85,7 @@ class Experiment:
     def write_galaxy_catalog(self, outfile_name: str, overwrite = False) -> None:
         """Generates a galaxy catalog as a fits file"""
         self.galaxy_table.write(outfile_name, overwrite = overwrite)
-    
+
     def write_all_catalogs(self, overwrite = False) -> None:
         """Writes all the catalogs from the experiment."""
         self.write_group_catalog('group_catalog.fits', overwrite)
@@ -94,16 +94,16 @@ class Experiment:
 if __name__ == '__main__':
     INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Kids/Kids_S_hemispec_no_dupes_updated.tbl'
     INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Kids/WISE-SGP_redshifts_w1mags.tbl'
-    INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Test_Data/Test_Cat.tbl'
+    #INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Test_Data/Test_Cat.tbl'
     cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
     data = read_data(INFILE)
-    KIDS = Survey(data, cosmo, 11.75)
+    KIDS = Survey(data, cosmo, 18.)
     KIDS.convert_z_into_cz('zcmb')
-    #KIDS.make_mag_colum('W1')
+    KIDS.make_mag_colum('W1')
     test_run = Experiment(
-        d0_initial=0.3, d0_final=0.6,
-        v0_initial=100, v0_final=400,
+        d0_initial=0.3, d0_final=0.8,
+        v0_initial=100, v0_final=500,
         d_max=2., v_max=1000,
-        n_trials=3, cutoff=0.5, survey = KIDS
+        n_trials=10, cutoff=0.5, survey = KIDS
         )
     test_run.write_all_catalogs(overwrite = True)
