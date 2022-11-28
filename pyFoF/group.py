@@ -28,7 +28,6 @@ class Group:
         self.luminosity_distance = self.survey.cosmology.luminosity_distance(self.redshift).value
         self.comoving_distance = self.survey.cosmology.comoving_distance(self.redshift).value
 
-
         coords = SkyCoord(
             ra = self.ra * u.deg, dec = self.dec * u.deg, distance = self.luminosity_distance*u.Mpc)
         self.galactic_l = coords.galactic.l.value
@@ -59,10 +58,13 @@ class Group:
 
     def quicklook_3d(self):
         """Quick look at the group data in 3d."""
+        redshifts = self.survey.data_frame['vel'].values / constants.c.to(u.km/u.s).value
+        distances = self.survey.cosmology.luminosity_distance(redshifts).value
         fig = plt.figure()
         coords = SkyCoord(
             ra = self.survey.data_frame['ra'][self.members]*u.deg,
-            dec = self.survey.data_frame['dec'][self.members]*u.deg)
+            dec = self.survey.data_frame['dec'][self.members]*u.deg,
+            distance = distances * u.Mpc)
         ax = fig.add_subplot(projection='3d')
         ax.scatter(
             coords.cartesian.x.value,
