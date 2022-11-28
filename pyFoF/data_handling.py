@@ -3,7 +3,6 @@
 from astropy.table import Table
 import pandas as pd
 
-
 def read_in_fits_table(fits_table_name: str) -> pd.DataFrame:
     """reads in a fits table."""
     fits_table = Table.read(fits_table_name)
@@ -67,7 +66,6 @@ def read_data(file_name:str) -> pd.DataFrame:
     d_f = EXTENSIONS[ext](file_name)
     d_f = auto_convert_df_types(d_f)
     return d_f
-
 
 if __name__ == '__main__':
     INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Kids/WISE-SGP_redshifts_w1mags.tbl'

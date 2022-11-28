@@ -10,7 +10,7 @@ from astropy.cosmology import FlatLambdaCDM
 from rich.progress import Progress
 from survey import Survey
 from utils import calculate_angular_seperation, wrap_mean
-from data import read_data
+from data_handling import read_data
 from group import Group
 
 

@@ -4,7 +4,6 @@ from typing import Tuple, List
 import numpy as np
 import networkx as nx
 from tqdm import tqdm
-import datetime
 
 def get_tuples(array_group: np.ndarray) -> Tuple[List, List]:
     """All possible connections within the local group we are checking."""
