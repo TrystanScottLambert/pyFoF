@@ -93,13 +93,14 @@ class Experiment:
 
 if __name__ == '__main__':
     INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Kids/Kids_S_hemispec_no_dupes_updated.tbl'
-    INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Kids/WISE-SGP_redshifts_w1mags.tbl'
+    #INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Kids/WISE-SGP_redshifts_w1mags.tbl'
     #INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Test_Data/Test_Cat.tbl'
     cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
     data = read_data(INFILE)
     KIDS = Survey(data, cosmo, 18.)
-    KIDS.convert_z_into_cz('zcmb')
-    KIDS.make_mag_colum('W1')
+    KIDS.convert_z_into_cz('z_helio')
+    #KIDS.make_mag_colum('W1')
+    KIDS.data_frame['mag'] = np.random.normal(15, 2, len(KIDS.data_frame))
     test_run = Experiment(
         d0_initial=0.3, d0_final=0.8,
         v0_initial=100, v0_final=500,
