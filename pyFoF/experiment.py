@@ -1,4 +1,9 @@
 """Friends of friends group theory implemntation based on Lambert et, al. (2020)"""
+import multiprocessing
+
+from concurrent.futures import ProcessPoolExecutor
+from typing import Optional
+import rich.progress as rp
 
 import numpy as np
 import pandas as pd
@@ -20,7 +25,7 @@ class Experiment:
     """Class for one run of the modern algorithm."""
     def __init__(
         self, d0_initial, d0_final, v0_initial, v0_final,
-        d_max, v_max, n_trials, cutoff, survey):
+        d_max, v_max, n_trials, cutoff, survey, n_workers: Optional[int] = None):
         """Initializing."""
         self.d0s = np.linspace(d0_initial, d0_final, n_trials)
         self.v0s = np.linspace(v0_initial, v0_final, n_trials)
@@ -28,6 +33,11 @@ class Experiment:
         self.d_max = d_max
         self.survey = survey
         self.number_of_trials = n_trials
+        if n_workers:
+            self.n_workers = n_workers
+        else:
+            self.n_workers = multiprocessing.cpu_count()
+
         members = self.run()
         group_theory_data = stabalize(members, cutoff, n_trials)
         self.groups = [
@@ -44,18 +54,75 @@ class Experiment:
         self.galaxy_table = self._convert_pd_to_fitstable(self.survey.data_frame)
         self.edge_data = group_theory_data[1]
 
-    def run(self):
+    def run(self, use_multiprocessing: bool = True):
         """Runs the algorithm."""
-        results = [
-            Trial(
-                self.survey, {
-                    "d_0": self.d0s[i], "v_0": self.v0s[i], "v_max": self.v_max, "d_max": self.d_max
-                    }
-                ).run() for i in range(self.number_of_trials)
-            ]
-        concatenated_results = np.concatenate(results)
-        members_list = [group.members for group in concatenated_results]
-        return members_list
+        if use_multiprocessing:
+            with rp.Progress(
+                "[progress.description]{task.description}",
+                rp.BarColumn(),
+                "[progress.percentage]{task.percentage:>3.0f}%",
+                rp.TimeRemainingColumn(),
+                rp.TimeElapsedColumn(),
+                refresh_per_second=1,  # bit slower updates
+            ) as progress:
+                futures = []  # keep track of the jobs
+                with multiprocessing.Manager() as manager:
+                    # this is the key - we share some state between our 
+                    # main process and our worker functions
+                    _progress = manager.dict()
+                    overall_progress_task = progress.add_task("[green]All jobs progress:")
+
+                    with ProcessPoolExecutor(max_workers=self.n_workers) as executor:
+                        for n in range(0, self.number_of_trials):  # iterate over the jobs we need to run
+                            # set visible false so we don't have a lot of bars all at once:
+                            task_id = progress.add_task(f"Trial {n+1} (d_0= {np.round(self.d0s[n], 2)}, v_0= {np.round(self.v0s[n], 2)}): ", visible=False)
+                            futures.append(executor.submit( Trial(
+                                                            self.survey, {
+                                                                "d_0": self.d0s[n], "v_0": self.v0s[n], "v_max": self.v_max, "d_max": self.d_max
+                                                                }
+                                                            ).run,
+                                                            progress_mode='experiment',
+                                                            progress_bar=_progress, 
+                                                            task_id=task_id))
+
+                        # monitor the progress:
+                        while (n_finished := sum([future.done() for future in futures])) < len(
+                            futures
+                        ):
+                            progress.update(
+                                overall_progress_task, completed=n_finished, total=len(futures)
+                            )
+                            for task_id, update_data in _progress.items():
+                                latest = update_data["progress"]
+                                total = update_data["total"]
+                                # update the progress bar for this task:
+                                progress.update(
+                                    task_id,
+                                    completed=latest,
+                                    total=total,
+                                    visible=latest < total,
+                                )
+
+                        # raise any errors
+                        results = []
+                        for future in futures:
+                            results.append(future.result())
+                        concatenated_results = np.concatenate(results)
+                        members_list = [group.members for group in concatenated_results]
+                        
+            #assert len(results) == self.number_of_trials
+            return members_list
+        else:
+            results = [
+                Trial(
+                    self.survey, {
+                        "d_0": self.d0s[i], "v_0": self.v0s[i], "v_max": self.v_max, "d_max": self.d_max
+                        }
+                    ).run() for i in range(self.number_of_trials)
+                ]
+            concatenated_results = np.concatenate(results)
+            members_list = [group.members for group in concatenated_results]
+            return members_list
 
     def _add_group_info_to_df(self):
         """Adds the group ID and the galaxy weights to the survey data frame."""
@@ -92,9 +159,10 @@ class Experiment:
         self.write_galaxy_catalog('galaxy_catalog.fits', overwrite)
 
 if __name__ == '__main__':
-    INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Kids/Kids_S_hemispec_no_dupes_updated.tbl'
-    #INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Kids/WISE-SGP_redshifts_w1mags.tbl'
-    #INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Test_Data/Test_Cat.tbl'
+    INFILE = './data/Kids/Kids_S_hemispec_no_dupes_updated.tbl'
+    
+    #INFILE = './data/Kids/WISE-SGP_redshifts_w1mags.tbl'
+    #INFILE = './data/Test_Data/Test_Cat.tbl'
     cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
     data = read_data(INFILE)
     KIDS = Survey(data, cosmo, 18.)

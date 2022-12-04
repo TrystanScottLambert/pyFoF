@@ -62,7 +62,7 @@ def get_node_arrays(stable_list):
     """makes a list of galaxy ids for every true group."""
     return [list(stable_group.nodes) for stable_group in stable_list]
 
-def get_edges_arrays(stable_list: List[nx.Graph]) -> np.ndarray[List]:
+def get_edges_arrays(stable_list: List[nx.Graph]) -> np.ndarray:
     """Writing the edges as arrays"""
     edges_array=[]
     for stable_graph in stable_list:

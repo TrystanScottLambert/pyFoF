@@ -148,23 +148,50 @@ class ClassicFoF(BaseFoF):
             friends_after = self._remove_outlying_members(friends_after)
         return friends_after
 
-    def run(self):
+    def run(self, 
+            progress_mode,
+            progress_bar,
+            task_id,
+            verbose=0):
         """Run one friends-of-friends trial."""
         checked = np.zeros(len(self.survey.data_frame))
+        total = len(checked)
         galaxies_left = np.where(checked == 0)[0]
         groups = []
 
-        with Progress() as progress:
-            task = progress.add_task(
-                f'Finding groups with d0 = {round(self.d_0,2)} and v0 = {round(self.v_0,2)} ',
-                total=len(checked)
-                )
+        if progress_mode == 'experiment':
+            if verbose == 2:
+                print('INFO: Running Classic FoF in experiment mode...')
+            total_progress = 0
             while len(galaxies_left) > 0:
                 new_group = self._find_group(np.random.choice(galaxies_left), galaxies_left)
                 groups.append(Group(new_group, self.survey))
                 checked[new_group] = 1
                 galaxies_left = np.where(checked == 0)[0]
-                progress.update(task, advance = len(new_group))
+                total_progress += len(new_group)
+                progress_bar[task_id] = {"progress": total_progress, "total": total}
+        elif progress_mode == 'single_trial':
+            if verbose == 2:
+                print('INFO: Running Classic FoF in single trial mode...')
+            with rp.Progress() as progress:
+                task = progress.add_task(
+                    f'INFO: {self.fof_trial_name}: Finding groups with d0 = {round(self.d_0,2)} and v0 = {round(self.v_0,2)} ',
+                    total=len(checked)
+                    )
+                while len(galaxies_left) > 0:
+                    new_group = self._find_group(np.random.choice(galaxies_left), galaxies_left)
+                    groups.append(Group(new_group, self.survey))
+                    checked[new_group] = 1
+                    galaxies_left = np.where(checked == 0)[0]
+                    progress.update(task, advance = len(new_group))
+        else:
+            if verbose == 2:
+                print('INFO: Running Classic FoF in debug mode...')
+            while len(galaxies_left) > 0:
+                new_group = self._find_group(np.random.choice(galaxies_left), galaxies_left)
+                groups.append(Group(new_group, self.survey))
+                checked[new_group] = 1
+                galaxies_left = np.where(checked == 0)[0]
         return groups
 
 class Trial:
@@ -216,14 +243,14 @@ class Trial:
         """gets the trial settings."""
         pass
 
-    def run(self):
+    def run(self, progress_mode, progress_bar, task_id):
         """Runs one instance of an fof algorithm."""
-        return self.fof_trial.run()
+        return self.fof_trial.run(progress_mode, progress_bar, task_id)
 
 if __name__ == '__main__':
-    INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Kids/Kids_S_hemispec_no_dupes_updated.tbl'
-    INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Kids/WISE-SGP_redshifts_w1mags.tbl'
-    #INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Test_Data/Test_Cat.tbl'
+    INFILE = './data/Kids/Kids_S_hemispec_no_dupes_updated.tbl'
+    #INFILE = './data/Kids/WISE-SGP_redshifts_w1mags.tbl'
+    #INFILE = './data/Test_Data/Test_Cat.tbl'
     cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
     data = read_data(INFILE)
     KIDS = Survey(data, cosmo, 11.75)

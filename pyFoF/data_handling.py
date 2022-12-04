@@ -68,8 +68,8 @@ def read_data(file_name:str) -> pd.DataFrame:
     return d_f
 
 if __name__ == '__main__':
-    INFILE = '/home/trystan/Desktop/Work/pyFoF/data/Kids/WISE-SGP_redshifts_w1mags.tbl'
-    INFILE_FITS = '/home/trystan/Desktop/Work/pyFoF/data/Kids/WISE-SGP_redshifts_w1mags.fits'
+    INFILE = './data/Kids/WISE-SGP_redshifts_w1mags.tbl'
+    INFILE_FITS = './data/Kids/WISE-SGP_redshifts_w1mags.fits'
 
     df = read_data(INFILE)
     df_fits = read_data(INFILE_FITS)
