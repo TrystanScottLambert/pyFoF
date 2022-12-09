@@ -6,3 +6,5 @@ pyFoF/__pycache__
 pyFoF/__pycache__/*
 */__pycache__/*
 */__pycache__/
+**/__pycache__/
+**/__pycache__/*
