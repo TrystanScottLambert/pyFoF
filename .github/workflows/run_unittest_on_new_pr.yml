@@ -26,5 +26,4 @@ jobs:
       - name: Test with unittest
         run: |
           cd .
-          python3 -m unittest tests.test_utils
-          python3 -m unittest tests.test_fof%
+          tests/run_tests
