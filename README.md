@@ -3,14 +3,37 @@ Python package to perform group finding in redshift surveys.
 
 ## Installation
 
-pyFoF will soon be pip installable. Once pip installation is announced, one can simply run,
+### Via Pip
+
+pyFoF is pip installable. One can simply run,
 
 ```
-pip install pyFoF
+pip install FoFpy
 ```
 
-Note that it is important to make sure the package is spelled correctly and with proper case sensitivity so as to not conflict with similarly named packages in other domain areas.
+Note that it is important to make sure the package is spelled correctly and with proper case sensitivity so as to not conflict with similarly named packages in other domain areas. Specifically, while the repository name is pyFoF, the deployed and installable package is named Fofpy. We are busy working on refactoring the repository to resolve this name conflict and subsequent mismatch.
 
+### Via Source
+
+To install pyFoF from source, first we download the repository using git,
+
+```bash
+git clone https://github.com/TrystanScottLambert/pyFoF.git
+```
+
+Then once we've cloned the repo, we will change directory into the pyFoF folder using,
+
+```bash
+cd pyFoF
+```
+
+Following this, we need only run,
+
+```bash
+pip3 install .
+```
+
+Remember to test your installation using the example provided in the sections below.
 
 ## How PyFoF Works
 
@@ -21,40 +44,41 @@ The modified version runs the original algorithm multiple times and averages the
 ## Example
 
 First lets import the package. 
-```
+```python
 import pyfof
 from astropy.cosmology import FlatLambdaCDM
 ```
 
 We will use the KIDS survey as an example. This file is saved as: Kids_S_hemispec_no_dupes_updated.tbl and has the columns ra, dec, vel and the wise magnitudes---dentoted as w1. A cosmology must be decided upon before using running the group finder, astropy provides a useful cosmology package which pyfof reads. Most of the time FlatLambdaCDM should be sufficient. 
 
-```
+```python
 cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
 ```
 
 We have included a data_handling module to read in catalogs stored as fits files or as standard IAUPAC tables. The minimum number of columns required is ra, dec, velocity, and magnitudes. Although, the read_data function will create a data object weather or not these columns exist, but the program will not run without them. 
 
-```
+```python
 from pyfof.datahandling import read_data
-INFILE = 'Kids_S_hemispec_no_dupes_updated.tbl
+INFILE = 'Kids_S_hemispec_no_dupes_updated.tbl'
 data = read_data(INFILE)
 ```
 
 We must create a "Survey" Object where we will pass the cosmology that was decided apon as well as the parameters of the Schecter function that the user wishes to use. If no shecter parameters are used then the default parameters, suggested in Kochanek et. al., (2001): α = −1.02, M∗ = −24.2 mag, and Φ∗ = 0.42×10−2 Mpc-3. The apparent-magnitude-limit of the survey needs to also be given. If this isn't set by the design of the survey, then either the smallest magnitude can be used, or any another reasonable minimum (such as the 3 sigma of a guassian).
 
-```
+```python
 from pyfof.survey import Survey
 KIDS = Survey(data, cosmo, 18.)
 ```
 
 The survey object has a helper function to convert columns from redshift to cz (using the cosmology)---in case that the latter is the given column. Doing this will create a new column in the Survey object with the correct naming. 
-```
+
+```python
 KIDS.convert_z_into_cz('z_helio')
 ```
 
 Once a survey has been created with the correct four columns with the case-sensitive names ra, dec, vel, and mag, the program be run: 
 
-```
+```python
     run = pyfof.Experiment(
         d0_initial=0.3, d0_final=0.8,
         v0_initial=100, v0_final=500,
@@ -62,10 +86,11 @@ Once a survey has been created with the correct four columns with the case-sensi
         n_trials=10, cutoff=0.5, survey = KIDS
         )
 ```
+
 The parameters which must be passed are the initial and final linking lenghts (v0 and d0), the max allowable value for the d0 linking length and the max value for the v0 linking lengths, the number of trials to run (note that these trials will be run in parrallel), the final cutoff that will happen after averaging all the results and the survey to run on. 
 
 After this has been run we can write the results as ascii files. Two files will be produced, a galaxy catalog with the galaxy information data and a group catalog with galaxy-group data. Importantly this will have a galaxy id column which can be used to find the associate members in the galaxy catalog. 
 
-```
+```python
 run.write_all_catalogs(overwrite = True)
 ```
