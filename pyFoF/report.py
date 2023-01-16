@@ -2,13 +2,15 @@
 import pandas as pd
 import numpy as np
 from data_handling import read_data
+from astropy.cosmology import FlatLambdaCDM
+from survey import Survey
 
-import sklearn.metrics 
+import metrics 
 
 valid_metrics_dict = {
-    'silhouette_score': sklearn.metrics.cluster.silhouette_score,
-    'calinski_harabasz_score': sklearn.metrics.cluster.calinski_harabasz_score,
-    'davies_bouldin_score': sklearn.metrics.cluster.davies_bouldin_score
+    'silhouette_score': metrics.cluster.redshift_silhouette_score,
+    'calinski_harabasz_score': metrics.cluster.redshift_calinski_harabasz_score,
+    'davies_bouldin_score': metrics.cluster.redshift_davies_bouldin_score
 }
 
 class GroupReport:
@@ -81,7 +83,19 @@ class GroupReport:
             return
 
 if __name__ == "__main__":
-    INFILE = '../data/Test_Data/group_catalog.fits'
+    GROUPS_INFILE = './group_catalog.fits'
+    DATA_INFILE = read_data('../data/Kids/Kids_S_hemispec_no_dupes_updated.tbl')
     #INFILE = './data/Kids/WISE-SGP_redshifts_w1mags.tbl'
     #INFILE = './data/Test_Data/Test_Cat.tbl'
-    data = read_data(INFILE)
+    datasurvey = read_data(DATA_INFILE)
+    data = read_data('galaxy_catalog.fits')
+    X = data[['ra', 'dec', 'vel']]
+    labels_test = data['group_id']
+
+    cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
+    KIDS = Survey(datasurvey, cosmo, 18.0)
+    KIDS.convert_z_into_cz('z_helio')
+    KIDS.data_frame['mag'] = np.random.normal(15, 2, len(KIDS.data_frame))
+    H0_value = KIDS.cosmology.H0.value
+
+    metrics.redshift_davies_bouldin_score(X, labels_test, H0_value, column_names=['ra', 'dec', 'vel'])
