@@ -4,11 +4,20 @@
 name: ci-python-unittest
 
 on:
-  pull_request:
-    branches: [dev, main]
+  push:
+    branches:
+      - "**"
+      - "!main"
+pull_request:
+  branches:
+    - main
+  types: [opened, synchronize, closed]
+
+workflow_dispatch:
 
 jobs:
   build:
+    if: (!(github.event.action == 'closed' && github.event.pull_request.merged != true))
     runs-on: ubuntu-latest
     strategy:
       matrix:
