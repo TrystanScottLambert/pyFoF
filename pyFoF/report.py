@@ -6,11 +6,26 @@ from astropy.cosmology import FlatLambdaCDM
 from survey import Survey
 
 import metrics 
+from utils import redshift_projected_unscaled_separation
+
+import sklearn.metrics
 
 valid_metrics_dict = {
-    'silhouette_score': metrics.cluster.redshift_silhouette_score,
-    'calinski_harabasz_score': metrics.cluster.redshift_calinski_harabasz_score,
-    'davies_bouldin_score': metrics.cluster.redshift_davies_bouldin_score
+    'silhouette_score': metrics.redshift_silhouette_score,
+    'calinski_harabasz_score': metrics.redshift_calinski_harabasz_score,
+    'davies_bouldin_score': metrics.redshift_davies_bouldin_score,
+    'dunn_index_score': metrics.redshift_dunn_index
+}
+
+valid_sklearn_metrics_dict = {
+    'adjusted_mutual_info_score': sklearn.metrics.adjusted_mutual_info_score,
+    'adjusted_rand_score': sklearn.metrics.adjusted_rand_score,
+    'completeness_score': sklearn.metrics.completeness_score,
+    'contingency_matrix': sklearn.metrics.cluster.contingency_matrix,
+    'pair_confusion_matrix': sklearn.metrics.cluster.pair_confusion_matrix,
+    'fowlkes_mallows_score': sklearn.metrics.fowlkes_mallows_score,
+    'homogeneity_score': sklearn.metrics.homogeneity_score,
+    'v_measure_score': sklearn.metrics.v_measure_score
 }
 
 class GroupReport:
@@ -34,15 +49,14 @@ class GroupReport:
             }
     """
 
-    def __init__(self, dataset, reporting_metric_subset = 'all', output_dict = True):
-
-        if type(dataset) != pd.DataFrame:
-            raise TypeError('Type of dataset provided must be a Pandas Dataframe.')
-
-        self.dataset = dataset
-
-        self.group_labels = dataset['group_id']
-        self.X = np.array(self.dataset.drop(['group_id'], axis = 1))
+    def __init__(self,
+                dataset: pd.DataFrame,
+                h0_value: float,
+                reporting_metric_subset: str = 'all',
+                output_dict: bool = True,
+                column_names: list[str] = ['ra', 'dec', 'vel'],
+                group_id_column_name: str = 'group_id',
+                silhouette_subset_frac: float = 1.0):
 
         if reporting_metric_subset != 'all':
             if type(reporting_metric_subset) != list:
@@ -51,10 +65,33 @@ class GroupReport:
                 if metric_name not in valid_metrics_dict:
                     raise ValueError('Invalid reporting metric specified. Must be one of silhouette_score, calinski_harabasz_score, or davies_bouldin_score')
 
+        if silhouette_subset_frac <= 0.0 or silhouette_subset_frac > 1.0:
+            raise ValueError(f'Values for silhouette_subset_frac must be between 0 and 1 of type float. Value provided is {silhouette_subset_frac}')
+        
+        self.silhouette_subset_frac = silhouette_subset_frac
         self.reporting_metric_subset = reporting_metric_subset
 
         if self.reporting_metric_subset == 'all':
             self.reporting_metric_subset = ['silhouette_score', 'calinski_harabasz_score', 'davies_bouldin_score']
+
+        if not group_id_column_name in dataset.columns:
+            raise ValueError(f'Column name provided for group IDs in parameter group_id_column_name is not present in dataset columns! Value provided was {group_id_column_name}. Please use one of dataset.column values to specify the field name.')
+        
+        for column_name in column_names:
+            if not column_name in dataset.columns:
+                raise ValueError(f'One column name provided in parameter column_names is not present in dataset columns! Value provided was {column_name}. Please use one of dataset.column values to specify the field name.')
+
+        self.column_names = column_names
+        self.group_id_column_name = group_id_column_name
+        self.h0_value = h0_value
+
+        self.dataset = dataset[self.column_names]
+
+        self.X = np.array(dataset[self.column_names])
+        self.group_labels = dataset[self.group_id_column_name]
+
+        self.X_frac = dataset[self.column_names].sample(frac = self.silhouette_subset_frac)
+        self.group_labels_frac = self.group_labels[self.X_frac.index]
 
         self.output_dict = output_dict
         self.metrics_dict = {}
@@ -63,7 +100,28 @@ class GroupReport:
 
         metrics_dict = {}
         for metric_name in self.reporting_metric_subset:
-            metrics_dict[metric_name] = valid_metrics_dict[metric_name](self.X, self.group_labels)
+            metric_func = valid_metrics_dict[metric_name]
+
+            if ('silhouette' in metric_name) or ('dunn' in metric_name):
+                X_eval = self.X_frac.copy()
+                group_labels_eval = self.group_labels_frac.copy()
+            else:
+                X_eval = self.X.copy()
+                group_labels_eval = self.group_labels.copy()
+
+            if 'silhouette' in metric_name:
+                metrics_dict[metric_name] = metric_func(X_eval,
+                                                        group_labels_eval,
+                                                        metric = redshift_projected_unscaled_separation, 
+                                                        n_jobs=-1)
+            else:
+                metrics_dict[metric_name] = metric_func(X_eval,
+                                                        group_labels_eval,
+                                                        h0_value = self.h0_value,
+                                                        column_names = self.column_names, 
+                                                        wrap_columns = ['ra'],
+                                                        metric = redshift_projected_unscaled_separation, 
+                                                        n_jobs=-1)    
 
         self.metrics_dict = metrics_dict
 
@@ -99,3 +157,4 @@ if __name__ == "__main__":
     H0_value = KIDS.cosmology.H0.value
 
     metrics.redshift_davies_bouldin_score(X, labels_test, H0_value, column_names=['ra', 'dec', 'vel'])
+    

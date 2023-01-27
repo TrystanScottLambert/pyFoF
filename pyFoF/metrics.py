@@ -12,7 +12,7 @@ import functools
 import numpy as np
 import pandas as pd
 
-from utils import wrap_mean, calculate_angular_seperation, redshift_catalog_mean, redshift_projected_unscaled_separation
+from utils import redshift_catalog_mean, redshift_projected_unscaled_separation
 #from fof import BaseFoF
 
 from sklearn.utils import check_X_y, check_random_state, _safe_indexing
@@ -221,7 +221,7 @@ def redshift_silhouette_samples(X, labels, *, metric="euclidean", **kwds):
     return np.nan_to_num(sil_samples)
 
 
-def redshift_calinski_harabasz_score(X, labels, h0_value, column_names=None, wrap_columns=['ra']):
+def redshift_calinski_harabasz_score(X, labels, h0_value, metric='euclidean', column_names=None, wrap_columns=['ra'], **kwds):
     """Compute the Calinski and Harabasz score.
     It is also known as the Variance Ratio Criterion.
     The score is defined as ratio of the sum of between-cluster dispersion and
@@ -269,7 +269,7 @@ def redshift_calinski_harabasz_score(X, labels, h0_value, column_names=None, wra
     )
 
 
-def redshift_davies_bouldin_score(X, labels, h0_value, column_names=None, wrap_columns=['ra']):
+def redshift_davies_bouldin_score(X, labels, h0_value, metric='euclidean', column_names=None, wrap_columns=['ra'], **kwds):
     """Compute the Davies-Bouldin score.
     The score is defined as the average similarity measure of each cluster with
     its most similar cluster, where similarity is the ratio of within-cluster
@@ -311,11 +311,11 @@ def redshift_davies_bouldin_score(X, labels, h0_value, column_names=None, wrap_c
         cluster_k = _safe_indexing(X, labels == k)
         centroid = redshift_catalog_mean(cluster_k, column_names, wrap_columns)
         centroids[k] = centroid
-        pairwise_distances_output = pairwise_distances(cluster_k, [centroid], metric=redshift_projected_unscaled_separation)
+        pairwise_distances_output = pairwise_distances(cluster_k, [centroid], metric=metric)
         pairwise_distances_output = pairwise_distances_output/h0_value
         intra_dists[k] = np.average(pairwise_distances_output)
 
-    centroid_distances = pairwise_distances(centroids, metric=redshift_projected_unscaled_separation)
+    centroid_distances = pairwise_distances(centroids, metric=metric)
     centroid_distances = centroid_distances/h0_value
 
     if np.allclose(intra_dists, 0) or np.allclose(centroid_distances, 0):
@@ -326,3 +326,55 @@ def redshift_davies_bouldin_score(X, labels, h0_value, column_names=None, wrap_c
     scores = np.max(combined_intra_dists / centroid_distances, axis=1)
     return np.mean(scores)
 
+
+def redshift_dunn_index(X, labels, h0_value, metric='euclidean', column_names=None, wrap_columns=['ra']):  
+    # Method for calculating Dunn's index
+    X, labels = check_X_y(X, labels)
+    le = LabelEncoder()
+    labels = le.fit_transform(labels)
+    n_samples, n_dim = X.shape
+    n_labels = len(le.classes_)
+    check_number_of_labels(n_labels, n_samples)
+
+    diam_lst = []  # List holding the diameter of the clusters
+    dist_lst = []  # List that holds the smallest distance between points in different sets
+    if len(dist_lst) == 0:
+        min_dist = 1
+    else:
+        min_dist = min(dist_lst)
+
+    centroids = np.zeros((n_labels, n_dim), dtype=float)
+
+    for k in range(n_labels):
+        cluster_k = _safe_indexing(X, labels == k)
+        centroid = redshift_catalog_mean(cluster_k, column_names, wrap_columns)
+        centroids[k] = centroid
+
+    n_centroids = n_labels
+
+    # Calculate the diameters of the clusters
+    for k in range(n_centroids):
+        clust_diam_lst = []  # List that holds the greatest distance between data in the set
+        for i in range(n_samples):
+            for j in range(n_samples):
+                # If x and y points belong to the same cluster and cluster labels are equal to k
+                if labels[i] == labels[j] and labels[i] == k:
+                    #Add distance between x and y points to clust_diam_lst
+                    clust_diam_lst.append(metric(X[i], X[j]))
+                    diam_lst.append(max(clust_diam_lst))  # Add the largest element of clust_diam_lst to diam_lst
+    max_diam = max(diam_lst)  # Assign the largest element of diam_lst to the variable max_diam
+
+    # Calculate the smallest distance between points in different clusters
+    for i in range(n_centroids):
+        for j in range(i + 1, n_centroids):
+            clust_dist_lst = []  # List that holds the distances of data between two sets
+            for x in range(n_samples):
+                for y in range(n_samples):
+                    # Check if x is in cluster i and y is in cluster j. if so calculate the distance ij between the two clusters, later take the min
+                    if labels[x] == i and labels[y] == j:
+                        clust_dist_lst.append(metric(X[x], X[y]))
+            dist_lst.append(min(clust_dist_lst))  # Add smallest element of clust_dist_lst to dist_lst
+
+    dunn_index = min_dist / max_diam
+
+    return dunn_index 
