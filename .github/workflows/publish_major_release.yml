@@ -1,4 +1,4 @@
-name: Publish Production Package
+name: Test and Publish Production Package
 
 on:
   push:
@@ -43,6 +43,8 @@ jobs:
           pip install
           build
           --user
+      - name: List current directory
+        run: ls
       - name: Build a binary wheel and a source tarball
         run: >-
           python -m
