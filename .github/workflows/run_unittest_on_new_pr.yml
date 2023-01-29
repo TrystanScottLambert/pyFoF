@@ -4,13 +4,8 @@
 name: ci-python-unittest
 
 on:
-  push:
-    branches:
-      - "**"
-      - "!main"
-pull_request:
-  branches:
-    - main
+  pull_request:
+    branches: [dev, main]
   types: [opened, synchronize, closed]
 
 workflow_dispatch:
