@@ -6,6 +6,8 @@ name: ci-python-unittest
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+  push:
+    branches: [dev, main]
 
 jobs:
   build:
