@@ -44,7 +44,9 @@ jobs:
           build
           --user
       - name: Build a binary wheel and a source tarball
-        run: >-
+        run: |
+          cd ..
+          >-
           python -m
           build
           --sdist

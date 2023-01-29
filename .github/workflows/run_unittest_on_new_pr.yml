@@ -6,8 +6,6 @@ name: Run Tests on Commits to PR
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-  push:
-    branches: [dev, main]
 
 jobs:
   build:
