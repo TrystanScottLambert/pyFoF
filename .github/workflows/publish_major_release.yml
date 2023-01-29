@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   workflow_run:
-      workflows: [Run Tests]
+      workflows: [ci-python-unittest]
       types: [completed]
 
 jobs:
