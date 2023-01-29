@@ -43,17 +43,19 @@ jobs:
           pip install
           build
           --user
+      - name: List current directory
+        run: ls
+      - name: Change current directory
+        run: cd ..
       - name: Build a binary wheel and a source tarball
-        run: |
-          cd ..
-          >-
+        run: >-
           python -m
           build
           --sdist
           --wheel
           --outdir dist/
       - name: Publish distribution 📦 to Test PyPI 
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+        if: github.event_name == 'push'
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.TEST_PYPI_TOKEN }}
