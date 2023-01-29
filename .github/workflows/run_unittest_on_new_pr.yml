@@ -7,8 +7,6 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
-workflow_dispatch:
-
 jobs:
   build:
     if: (!(github.event.action == 'closed' && github.event.pull_request.merged != true))
