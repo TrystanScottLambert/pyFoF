@@ -5,8 +5,8 @@ import pylab as plt
 import astropy.units as u
 import astropy.constants as constants
 from astropy.coordinates import SkyCoord
-from utils import wrap_mean
-from survey import Survey
+from .utils import wrap_mean
+from .survey import Survey
 
 class Group:
     """group_properties"""

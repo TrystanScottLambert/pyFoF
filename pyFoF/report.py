@@ -1,20 +1,20 @@
 """Report class with clustering metrics to be used for reporting."""
 import pandas as pd
 import numpy as np
-from data_handling import read_data
+from .data_handling import read_data
 from astropy.cosmology import FlatLambdaCDM
-from survey import Survey
+from .survey import Survey
 
-import metrics 
-from utils import redshift_projected_unscaled_separation
+from .metrics import redshift_silhouette_score, redshift_calinski_harabasz_score, redshift_davies_bouldin_score, redshift_dunn_index
+from .utils import redshift_projected_unscaled_separation
 
 import sklearn.metrics
 
 valid_metrics_dict = {
-    'silhouette_score': metrics.redshift_silhouette_score,
-    'calinski_harabasz_score': metrics.redshift_calinski_harabasz_score,
-    'davies_bouldin_score': metrics.redshift_davies_bouldin_score,
-    'dunn_index_score': metrics.redshift_dunn_index
+    'silhouette_score': redshift_silhouette_score,
+    'calinski_harabasz_score': redshift_calinski_harabasz_score,
+    'davies_bouldin_score': redshift_davies_bouldin_score,
+    'dunn_index_score': redshift_dunn_index
 }
 
 valid_sklearn_metrics_dict = {
@@ -156,5 +156,5 @@ if __name__ == "__main__":
     KIDS.data_frame['mag'] = np.random.normal(15, 2, len(KIDS.data_frame))
     H0_value = KIDS.cosmology.H0.value
 
-    metrics.redshift_davies_bouldin_score(X, labels_test, H0_value, column_names=['ra', 'dec', 'vel'])
+    redshift_davies_bouldin_score(X, labels_test, H0_value, column_names=['ra', 'dec', 'vel'])
     
