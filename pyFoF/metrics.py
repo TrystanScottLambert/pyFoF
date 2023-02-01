@@ -20,7 +20,7 @@ from sklearn.metrics import pairwise_distances_chunked, pairwise_distances
 from sklearn.preprocessing import LabelEncoder
 
 def check_number_of_labels(n_labels, n_samples):
-    """Check that number of labels are valid.
+    """Check that number of labels are valid. Because checking the number of labels is important.
 
     Parameters
     ----------
