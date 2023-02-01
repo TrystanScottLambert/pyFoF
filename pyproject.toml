@@ -7,14 +7,14 @@ py-modules = ["data", "pyFoF"]
 
 [project]
 name = "FoFpy"
-version = "1.0.3"
+version = "1.0.4"
 authors = [
   { name="Trystan Scott Lambert", email="trystanscottlambert@gmail.com" },
   { name="Victor Gueorguiev Gueorguiev", email="victor.gueorg@gmail.com"}
 ]
 description = "Python package to perform group finding in redshift surveys."
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
