@@ -5,10 +5,11 @@ Python package to perform group finding in redshift surveys.
 
 ### Via Pip
 
+Note that pyFoF needs to be run using python 3.11
 pyFoF is pip installable. One can simply run,
 
 ```
-pip install FoFpy
+pip3.11 install FoFpy
 ```
 
 Note that it is important to make sure the package is spelled correctly and with proper case sensitivity so as to not conflict with similarly named packages in other domain areas. Specifically, while the repository name is pyFoF, the deployed and installable package is named Fofpy. We are busy working on refactoring the repository to resolve this name conflict and subsequent mismatch.
