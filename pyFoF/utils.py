@@ -1,6 +1,9 @@
 """Utilities which are needed for the package."""
 
 import numpy as np
+import pandas as pd 
+
+from typing import Union
 
 def calculate_angular_seperation(long_a, lat_a, long_b, lat_b):
     """
@@ -43,6 +46,47 @@ def wrap_mean(array):
     else:
         avg=np.mean(array)
     return avg
+
+def redshift_projected_unscaled_separation(x, y):
+    """Works out the projected distances in Mpc (as apoosed to arcseconds)."""
+    ra1, dec1, v1 = x
+    ra2, dec2, v2 = y
+    separations = calculate_angular_seperation(ra1, dec1, ra2, dec2)
+    theta = (np.pi/180) * (separations/2.0)
+    v_averages = (v1 + v2)/2.0
+    on_sky_distances_mpc = np.sin(theta) * (v_averages)
+    return on_sky_distances_mpc
+    
+def redshift_catalog_mean(X: Union[np.array, pd.DataFrame], 
+                          column_names: str, 
+                          wrap_columns: str = ['ra']) -> np.array:
+    """Works out the variable/field means of a redshift catalog dataset taking into account fields of cyclic types using a wrap_mean approach."""
+
+    if column_names is None:
+        if type(X) != pd.DataFrame:
+            raise TypeError("X is not a Pandas DataFrame, please either provide X as a Pandas DataFrame object or provide a column_name list of column names")
+
+    if column_names is None:
+        if not (set(wrap_columns) <= set(X.columns)):
+            raise ValueError("Provided set of column names in X do not match names of wrap/cyclical column names wrap_columns.")
+    else:
+        if not (set(wrap_columns) <= set(column_names)):
+            raise ValueError("Provided set of column names in column_names do not match names of wrap/cyclical column names wrap_columns.")
+    
+    if type(X) is np.ndarray:
+        if len(column_names) != X.shape[1]:
+            raise ValueError("Provided list of column names is not of the same length as the number of fields/variables present in dataset X. Please state the full set of column names for the dataset in the order they appear.")
+        X = pd.DataFrame(X, columns=column_names)
+
+    list_of_means = []
+
+    for colname in X.columns:
+        if colname in wrap_columns:
+            list_of_means.append(wrap_mean(X[colname]))
+        else:
+            list_of_means.append(np.mean(X[colname]))
+
+    return np.array(list_of_means)
 
 def integrate(lower_bound,upper_bound,function):
     """Simple integration method which is faster than the numpy methods."""
