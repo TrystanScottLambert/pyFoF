@@ -3,7 +3,11 @@
 import uuid
 from abc import ABC, abstractmethod
 from typing import Optional, TypedDict
-from typing import NotRequired
+try:
+    from typing import NotRequired
+except:
+    from typing_extensions import NotRequired
+
 import numpy as np
 from scipy.integrate import cumtrapz
 from astropy.cosmology import FlatLambdaCDM
