@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.10', '3.11']
+        python-version: ['3.11']
     steps:
       - uses: actions/checkout@v3
         with:
@@ -56,7 +56,8 @@ jobs:
           --outdir dist/
       - name: Publish distribution 📦 to Test PyPI 
         if: github.event_name == 'push'
-        uses: pypa/gh-action-pypi-publish@release/v1
+        uses: JRubics/poetry-publish@v1.16
         with:
-          password: ${{ secrets.TEST_PYPI_TOKEN }}
-          repository_url: https://test.pypi.org/legacy/
+          pypi_token: ${{ secrets.TEST_PYPI_TOKEN }}
+          repository_name: "testpypi"
+          repository_url: "https://test.pypi.org/legacy/"
