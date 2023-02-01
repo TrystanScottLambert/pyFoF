@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["data", "pyFoF"]
+
+[project]
+name = "FoFpy"
+version = "1.0.2"
+authors = [
+  { name="Trystan Scott Lambert", email="trystanscottlambert@gmail.com" },
+  { name="Victor Gueorguiev Gueorguiev", email="victor.gueorg@gmail.com"}
+]
+description = "Python package to perform group finding in redshift surveys."
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/TrystanScottLambert/pyFoF"
+"Bug Tracker" = "https://github.com/TrystanScottLambert/pyFoF/issues"
