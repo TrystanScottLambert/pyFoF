@@ -12,7 +12,7 @@ import functools
 import numpy as np
 import pandas as pd
 
-from utils import redshift_catalog_mean, redshift_projected_unscaled_separation
+from .utils import redshift_catalog_mean, redshift_projected_unscaled_separation
 #from fof import BaseFoF
 
 from sklearn.utils import check_X_y, check_random_state, _safe_indexing
