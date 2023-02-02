@@ -5,10 +5,11 @@ Python package to perform group finding in redshift surveys.
 
 ### Via Pip
 
+Note that pyFoF needs to be run using python >= 3.10
 pyFoF is pip installable. One can simply run,
 
 ```
-pip install FoFpy
+pip3 install FoFpy
 ```
 
 Note that it is important to make sure the package is spelled correctly and with proper case sensitivity so as to not conflict with similarly named packages in other domain areas. Specifically, while the repository name is pyFoF, the deployed and installable package is named Fofpy. We are busy working on refactoring the repository to resolve this name conflict and subsequent mismatch.
@@ -45,7 +46,7 @@ The modified version runs the original algorithm multiple times and averages the
 
 First lets import the package. 
 ```python
-import pyfof
+import pyFoF
 from astropy.cosmology import FlatLambdaCDM
 ```
 
@@ -58,7 +59,7 @@ cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
 We have included a data_handling module to read in catalogs stored as fits files or as standard IAUPAC tables. The minimum number of columns required is ra, dec, velocity, and magnitudes. Although, the read_data function will create a data object weather or not these columns exist, but the program will not run without them. 
 
 ```python
-from pyfof.datahandling import read_data
+from pyFoF.datahandling import read_data
 INFILE = 'Kids_S_hemispec_no_dupes_updated.tbl'
 data = read_data(INFILE)
 ```
@@ -66,7 +67,7 @@ data = read_data(INFILE)
 We must create a "Survey" Object where we will pass the cosmology that was decided apon as well as the parameters of the Schecter function that the user wishes to use. If no shecter parameters are used then the default parameters, suggested in Kochanek et. al., (2001): α = −1.02, M∗ = −24.2 mag, and Φ∗ = 0.42×10−2 Mpc-3. The apparent-magnitude-limit of the survey needs to also be given. If this isn't set by the design of the survey, then either the smallest magnitude can be used, or any another reasonable minimum (such as the 3 sigma of a guassian).
 
 ```python
-from pyfof.survey import Survey
+from pyFoF.survey import Survey
 KIDS = Survey(data, cosmo, 18.)
 ```
 
@@ -79,7 +80,7 @@ KIDS.convert_z_into_cz('z_helio')
 Once a survey has been created with the correct four columns with the case-sensitive names ra, dec, vel, and mag, the program be run: 
 
 ```python
-    run = pyfof.Experiment(
+    run = pyFoF.experiment.Experiment(
         d0_initial=0.3, d0_final=0.8,
         v0_initial=100, v0_final=500,
         d_max=2., v_max=1000,
