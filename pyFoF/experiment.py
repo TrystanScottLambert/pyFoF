@@ -54,6 +54,7 @@ class Experiment:
         self.galaxy_table = self._convert_pd_to_fitstable(self.survey.data_frame)
         self.edge_data = group_theory_data[1]
 
+
     def run(self, use_multiprocessing: bool = True):
         """Runs the algorithm."""
         if use_multiprocessing:
@@ -123,6 +124,13 @@ class Experiment:
             concatenated_results = np.concatenate(results)
             members_list = [group.members for group in concatenated_results]
             return members_list
+    
+    def print_edge_data(self) -> None:
+        """Prints the edge data in id1, id2, weight format."""
+        f = open('edge_data.txt', 'w', encoding = 'utf-8')
+        for edge in self.edge_data:
+            f.write(f'{int(edge[0])} {int(edge[1])} {edge[2]} \n')
+        f.close()
 
     def _add_group_info_to_df(self):
         """Adds the group ID and the galaxy weights to the survey data frame."""
@@ -160,7 +168,7 @@ class Experiment:
 
 if __name__ == '__main__':
     INFILE = './data/Kids/Kids_S_hemispec_no_dupes_updated.tbl'
-    
+
     #INFILE = './data/Kids/WISE-SGP_redshifts_w1mags.tbl'
     #INFILE = './data/Test_Data/Test_Cat.tbl'
     cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
@@ -173,6 +181,7 @@ if __name__ == '__main__':
         d0_initial=0.3, d0_final=0.8,
         v0_initial=100, v0_final=500,
         d_max=2., v_max=1000,
-        n_trials=10, cutoff=0.5, survey = KIDS
+        n_trials=5, cutoff=0.5, survey = KIDS
         )
     test_run.write_all_catalogs(overwrite = True)
+    test_run.print_edge_data()
