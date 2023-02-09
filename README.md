@@ -80,7 +80,8 @@ KIDS.convert_z_into_cz('z_helio')
 Once a survey has been created with the correct four columns with the case-sensitive names ra, dec, vel, and mag, the program be run: 
 
 ```python
-    run = pyFoF.experiment.Experiment(
+    from pyFoF.experiment import Experiment
+    run = Experiment(
         d0_initial=0.3, d0_final=0.8,
         v0_initial=100, v0_final=500,
         d_max=2., v_max=1000,
@@ -94,4 +95,9 @@ After this has been run we can write the results as ascii files. Two files will 
 
 ```python
 run.write_all_catalogs(overwrite = True)
+```
+It's also possble to print out the edge data which is very useful for visualizing how the updated algorithm works. The edge_data.txt file contains the id of one galaxy, id of another galaxy, and the weight between them.
+
+```python
+run.print_edge_data()
 ```
