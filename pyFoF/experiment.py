@@ -9,11 +9,11 @@ import numpy as np
 import pandas as pd
 from astropy.cosmology import FlatLambdaCDM
 from astropy.table import Table
-from data_handling import read_data
-from survey import Survey
-from fof import Trial
-from graph_theory import stabalize
-from group import Group
+from .data_handling import read_data
+from .survey import Survey
+from .fof import Trial
+from .graph_theory import stabalize
+from .group import Group
 
 columns_to_drop = (
     'members',
@@ -118,7 +118,7 @@ class Experiment:
                     self.survey, {
                         "d_0": self.d0s[i], "v_0": self.v0s[i], "v_max": self.v_max, "d_max": self.d_max
                         }
-                    ).run() for i in range(self.number_of_trials)
+                    ).run(progress_mode='none') for i in range(self.number_of_trials)
                 ]
             concatenated_results = np.concatenate(results)
             members_list = [group.members for group in concatenated_results]

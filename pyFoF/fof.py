@@ -3,15 +3,20 @@
 import uuid
 from abc import ABC, abstractmethod
 from typing import Optional, TypedDict
-from typing import NotRequired
+try:
+    from typing import NotRequired
+except ImportError:
+    from typing_extensions import NotRequired
+
 import numpy as np
 from scipy.integrate import cumtrapz
 from astropy.cosmology import FlatLambdaCDM
-from rich.progress import Progress
-from survey import Survey
-from utils import calculate_angular_seperation, wrap_mean
-from data_handling import read_data
-from group import Group
+import rich.progress as rp
+
+from .survey import Survey
+from .utils import calculate_angular_seperation, wrap_mean
+from .data_handling import read_data
+from .group import Group
 
 
 class FoFArgs(TypedDict):
@@ -72,13 +77,21 @@ class BaseFoF(ABC):
 
 class ClassicFoF(BaseFoF):
     """Base class for the friends-of-friends algorithm"""
-    def __init__(self, survey: Survey, d_0: float, v_0: float, d_max: float, v_max: float, fof_optional_args: Optional[dict] = None) -> None:
+    def __init__(self, 
+                 survey: Survey, 
+                 d_0: float, 
+                 v_0: float, 
+                 d_max: float, 
+                 v_max: float, 
+                 fof_optional_args: Optional[dict] = None,
+                 fof_trial_name: Optional[str] = None) -> None:
         """Initializing. Requires linking lengths d_0 and v_0 which are the on-sky linking length
         in Mpc and the line-of-sight linking length in km/s respectively. As well as the maximum
         on-sky radius of a group (d_max) in Mpc and the maximum line-of-sight distance (v_max)
         in kpc."""
         super().__init__(survey=survey, d_0=d_0, v_0=v_0, d_max=d_max, v_max=v_max)
         self.fof_optional_args = fof_optional_args
+        self.fof_trial_name = fof_trial_name
 
     def _find_friends_from_point(self, right_ascension: float, dec: float, vel: float, free_galaxies: np.ndarray) -> np.ndarray:
         """Finds all the friends around a point (ra, dec, vel)"""
@@ -150,14 +163,17 @@ class ClassicFoF(BaseFoF):
 
     def run(self, 
             progress_mode,
-            progress_bar,
-            task_id,
+            progress_bar = None,
+            task_id = None,
             verbose=0):
         """Run one friends-of-friends trial."""
         checked = np.zeros(len(self.survey.data_frame))
         total = len(checked)
         galaxies_left = np.where(checked == 0)[0]
         groups = []
+
+        if progress_mode == 'experiment' and (progress_bar is None or task_id is None):
+            raise ValueError("ERROR: When progress mode is set to experiment, a progress bar manager dict object and task_id is required.")
 
         if progress_mode == 'experiment':
             if verbose == 2:
@@ -234,6 +250,7 @@ class Trial:
             self.fof_trial = algorithm
         elif self.algorithm_type == 'classic':
             self.fof_trial = ClassicFoF(survey=survey,
+                                  fof_trial_name=self.fof_trial_name,
                                 **self.fof_args,
                                 **self.fof_optional_args)
         else:
@@ -241,10 +258,16 @@ class Trial:
 
     def get_fof_trial_settings(self):
         """gets the trial settings."""
-        pass
+        return self.fof_args, self.fof_optional_args
 
-    def run(self, progress_mode, progress_bar, task_id):
+    def run(self, 
+            progress_mode: str, 
+            progress_bar = None, 
+            task_id = None):
         """Runs one instance of an fof algorithm."""
+        if progress_mode == 'experiment' and (progress_bar is None or task_id is None):
+            raise ValueError("ERROR: When progress mode is set to experiment, a progress bar manager dict object and task_id is required.")
+
         return self.fof_trial.run(progress_mode, progress_bar, task_id)
 
 if __name__ == '__main__':
@@ -258,4 +281,4 @@ if __name__ == '__main__':
     KIDS.make_mag_colum('W1')
     my_fof_args: FoFArgs = {"d_0": 0.56, "v_0": 350., "v_max": 1500., "d_max": 2.0}
     test_run = Trial(KIDS, my_fof_args)
-    test = test_run.run()
+    test = test_run.run(progress_mode='single_trial')
