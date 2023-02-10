@@ -22,3 +22,4 @@ dist/*
 dist
 *.egg-info/*
 *.egg-info
+.vscode/settings.json
