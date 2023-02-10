@@ -54,9 +54,29 @@ class Experiment:
         self.galaxy_table = self._convert_pd_to_fitstable(self.survey.data_frame)
         self.edge_data = group_theory_data[1]
 
-    def run(self, use_multiprocessing: bool = True):
+    def run(self, 
+            use_multiprocessing: bool = True):
         """Runs the algorithm."""
         if use_multiprocessing:
+            try:
+                # to ensure forwards and backwards compatibility with various OS versions which use spawn rather than fork 
+                # as the default process creation method. Spawn creates thread-related Runtime Errors related to children spawning 
+                # faster than parent processes can finish spawning, and require tighter controls not necessary for these use-cases.
+                multiprocessing.set_start_method('fork') 
+            except RuntimeError as runtime_error:
+                # Just print(e) is cleaner and more likely what we want,
+                # but if lets insist on printing message specifically whenever possible...
+                if hasattr(runtime_error, 'message'):
+                    error_message = runtime_error.message
+                else:
+                    error_message = runtime_error
+                
+                if str(error_message) == 'context has already been set':
+                    print('WARN: Multiprocessing context has already been set and is trying to be reset. You can only set this context once per Python session. Continuing with default')
+                else:
+                    print('ERROR: Multiprocessing has thrown an error on setting context to "fork". Traceback raised is printed below. Recommended setting is to run with use_multiprocessing=False and raise an issue in the GitHub repository for pyFoF.')
+                    raise
+            
             with rp.Progress(
                 "[progress.description]{task.description}",
                 rp.BarColumn(),
@@ -160,7 +180,7 @@ class Experiment:
 
 if __name__ == '__main__':
     INFILE = './data/Kids/Kids_S_hemispec_no_dupes_updated.tbl'
-    
+
     #INFILE = './data/Kids/WISE-SGP_redshifts_w1mags.tbl'
     #INFILE = './data/Test_Data/Test_Cat.tbl'
     cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
