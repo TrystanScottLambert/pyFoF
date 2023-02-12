@@ -42,7 +42,19 @@ class Experiment:
 
     def run(self, 
             use_multiprocessing: bool = True):
-        """Runs the algorithm."""
+        """
+        Runs the algorithm.
+        
+        Parameters
+        ----------
+        use_multiprocessing : bool
+            Whether to use multiprocessing for parallelisation of experiment trial runs. Default is true.
+        
+        Returns
+        -------
+            self.members : np.array
+                The list of members and associated galaxy group IDs to each member of a group
+        """
         if use_multiprocessing:
             try:
                 # to ensure forwards and backwards compatibility with various OS versions which use spawn rather than fork 
