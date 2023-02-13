@@ -87,6 +87,8 @@ Once a survey has been created with the correct four columns with the case-sensi
         d_max=2., v_max=1000,
         n_trials=10, cutoff=0.5, survey = KIDS
         )
+        
+    run.run()
 ```
 
 The parameters which must be passed are the initial and final linking lenghts (v0 and d0), the max allowable value for the d0 linking length and the max value for the v0 linking lengths, the number of trials to run (note that these trials will be run in parrallel), the final cutoff that will happen after averaging all the results and the survey to run on. 
