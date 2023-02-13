@@ -221,7 +221,16 @@ class Experiment:
         Function to return the edge data calculated after the graph theory post-processing
         """
         return self.edge_data
-
+    
+    def write_edge_data(self) -> None:
+        """Writes the edge data as a txt file for edge visualizaton."""
+        f = open('edge_data.txt', 'w')
+        f.write('# ID1, ID2, WEIGHT')
+        edge_data = self.get_edge_data()
+        for edge_datum in edge_data:
+            f.write(f'{int(edge_datum[0])} {int(edge_datum[1])} {edge_datum[2]} \n')
+        f.close()
+        
     def write_group_catalog(self, outfile_name: str, overwrite = False) -> None:
         """Generates a group catalog as a fits file."""
         self.group_table.write(outfile_name, overwrite = overwrite)
