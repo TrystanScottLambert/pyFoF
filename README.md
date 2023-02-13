@@ -59,16 +59,16 @@ cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
 We have included a data_handling module to read in catalogs stored as fits files or as standard IAUPAC tables. The minimum number of columns required is ra, dec, velocity, and magnitudes. Although, the read_data function will create a data object weather or not these columns exist, but the program will not run without them. 
 
 ```python
-from pyFoF.datahandling import read_data
+from pyFoF.data_handling import read_data
 INFILE = 'Kids_S_hemispec_no_dupes_updated.tbl'
 data = read_data(INFILE)
 ```
 
-We must create a "Survey" Object where we will pass the cosmology that was decided apon as well as the parameters of the Schecter function that the user wishes to use. If no shecter parameters are used then the default parameters, suggested in Kochanek et. al., (2001): α = −1.02, M∗ = −24.2 mag, and Φ∗ = 0.42×10−2 Mpc-3. The apparent-magnitude-limit of the survey needs to also be given. If this isn't set by the design of the survey, then either the smallest magnitude can be used, or any another reasonable minimum (such as the 3 sigma of a guassian).
+We must create a "Survey" Object where we will pass the cosmology that was decided apon as well as the parameters of the Schecter function that the user wishes to use. If no shecter parameters are given then the default parameters, suggested in Kochanek et. al., (2001): α = −1.02, M∗ = −24.2 mag, and Φ∗ = 0.42×10−2 Mpc-3 are assumed. The apparent-magnitude-limit of the survey needs to be given. If this isn't set by the design of the survey, then either the smallest magnitude can be used, or any another reasonable minimum (such as the 3 sigma of a guassian).
 
 ```python
 from pyFoF.survey import Survey
-KIDS = Survey(data, cosmo, 18.)
+KIDS = Survey(data, cosmo, apparent_mag_limit = 17.6, alpha = -1.02, m_star = -24.2, phi_star = 0.0108)
 ```
 
 The survey object has a helper function to convert columns from redshift to cz (using the cosmology)---in case that the latter is the given column. Doing this will create a new column in the Survey object with the correct naming. 
@@ -80,7 +80,8 @@ KIDS.convert_z_into_cz('z_helio')
 Once a survey has been created with the correct four columns with the case-sensitive names ra, dec, vel, and mag, the program be run: 
 
 ```python
-    run = pyFoF.experiment.Experiment(
+    from pyFoF.experiment import Experiment
+    run = Experiment(
         d0_initial=0.3, d0_final=0.8,
         v0_initial=100, v0_final=500,
         d_max=2., v_max=1000,
@@ -94,4 +95,9 @@ After this has been run we can write the results as ascii files. Two files will 
 
 ```python
 run.write_all_catalogs(overwrite = True)
+```
+It's also possble to print out the edge data which is very useful for visualizing how the updated algorithm works. The edge_data.txt file contains the id of one galaxy, id of another galaxy, and the weight between them.
+
+```python
+run.print_edge_data()
 ```
