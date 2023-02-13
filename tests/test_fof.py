@@ -6,7 +6,7 @@ from astropy.cosmology import FlatLambdaCDM
 from pyFoF import fof
 from pyFoF import data_handling
 from pyFoF import survey
-
+from pyFoF import experiment
 
 class TestFindingFriends(unittest.TestCase):
     """Running test to check Finding Friends is working" for around a point and around a galaxy."""
@@ -75,6 +75,22 @@ class TestFindingFriends(unittest.TestCase):
         test_run = fof.Trial(test_survey, fof_args)
         friends = test_run.fof_trial._find_friends_of_galaxy(0, np.arange(3))
         np.testing.assert_array_equal(friends, np.array([0,1,2]))
+
+    def test_check_experiment_class_runs(self):
+        """Checking that the checking array is working."""
+        INFILE = './data/Test_Data/Test_Cat.tbl'
+        cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
+        my_data = data_handling.read_data(INFILE)
+        test_survey = survey.Survey(my_data, cosmo, 18.)
+        test_survey.convert_z_into_cz('zcmb')
+        test_survey.data_frame['mag'] = np.random.normal(15, 2, len(test_survey.data_frame))
+        test_experiment = experiment.Experiment(
+            d0_initial=0.3, d0_final=0.8,
+            v0_initial=100, v0_final=500,
+            d_max=2., v_max=1000,
+            n_trials=10, cutoff=0.5, survey = test_survey
+            )
+        test_experiment.run()
 
 
 if __name__ == '__main__':
