@@ -101,5 +101,5 @@ run.write_all_catalogs(overwrite = True)
 It's also possble to print out the edge data which is very useful for visualizing how the updated algorithm works. The edge_data.txt file contains the id of one galaxy, id of another galaxy, and the weight between them.
 
 ```python
-run.print_edge_data()
+run.write_edge_data()
 ```
