@@ -2,7 +2,6 @@
 
 from astropy.table import Table
 import pandas as pd
-import numpy as np
 
 def read_in_fits_table(fits_table_name: str) -> pd.DataFrame:
     """reads in a fits table."""
@@ -58,6 +57,9 @@ def auto_convert_df_types(data_frame: pd.DataFrame) -> pd.DataFrame:
 
         elif isinstance(list(data_frame[col])[0], str):
             data_frame[col] = data_frame[col].astype(str)
+        
+        elif isinstance(list(data_frame[col])[0], bytes):
+            data_frame[col] = data_frame[col].str.decode('utf-8')
 
     return data_frame
 
@@ -71,8 +73,8 @@ def read_data(file_name:str) -> pd.DataFrame:
     return d_f
 
 if __name__ == '__main__':
-    INFILE = '../data/Kids/WISE-SGP_redshifts_w1mags.tbl'
-    INFILE_FITS = '../data/Kids/WISE-SGP_redshifts_w1mags.fits'
+    INFILE = './data/Kids/WISE-SGP_redshifts_w1mags.tbl'
+    INFILE_FITS = './data/Kids/WISE-SGP_redshifts_w1mags.fits'
 
     df = read_data(INFILE)
     df_fits = read_data(INFILE_FITS)
