@@ -2,6 +2,7 @@
 
 from astropy.table import Table
 import pandas as pd
+import numpy as np
 
 def read_in_fits_table(fits_table_name: str) -> pd.DataFrame:
     """reads in a fits table."""
@@ -45,20 +46,22 @@ def check_file_type(file_name: str) -> str:
     extension = file_name.split('.')[-1]
     return extension
 
+
 def auto_convert_df_types(data_frame: pd.DataFrame) -> pd.DataFrame:
     """Automatically assigns types to a data frame."""
     for col in data_frame.columns:
-        try:
+        if isinstance(list(data_frame[col])[0], int):
             data_frame[col] = data_frame[col].astype(int)
-        except ValueError:
-            try:
-                data_frame[col] = data_frame[col].astype(float)
-            except ValueError:
-                try:
-                    data_frame[col] = data_frame[col].astype(str)
-                except ValueError:
-                    pass
+
+        elif isinstance(list(data_frame[col])[0], float):
+            data_frame[col] = data_frame[col].astype(float)
+
+        elif isinstance(list(data_frame[col])[0], str):
+            data_frame[col] = data_frame[col].astype(str)
+
     return data_frame
+
+
 
 def read_data(file_name:str) -> pd.DataFrame:
     """Reads in data of any type and returns a data frame."""
@@ -68,8 +71,8 @@ def read_data(file_name:str) -> pd.DataFrame:
     return d_f
 
 if __name__ == '__main__':
-    INFILE = './data/Kids/WISE-SGP_redshifts_w1mags.tbl'
-    INFILE_FITS = './data/Kids/WISE-SGP_redshifts_w1mags.fits'
+    INFILE = '../data/Kids/WISE-SGP_redshifts_w1mags.tbl'
+    INFILE_FITS = '../data/Kids/WISE-SGP_redshifts_w1mags.fits'
 
     df = read_data(INFILE)
     df_fits = read_data(INFILE_FITS)
