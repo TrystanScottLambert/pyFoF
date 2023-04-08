@@ -2,6 +2,7 @@
 
 from astropy.table import Table
 import pandas as pd
+from typing import Union
 
 def read_in_fits_table(fits_table_name: str) -> pd.DataFrame:
     """reads in a fits table."""
@@ -46,24 +47,65 @@ def check_file_type(file_name: str) -> str:
     return extension
 
 
-def auto_convert_df_types(data_frame: pd.DataFrame) -> pd.DataFrame:
-    """Automatically assigns types to a data frame."""
-    for col in data_frame.columns:
-        if isinstance(list(data_frame[col])[0], int):
-            data_frame[col] = data_frame[col].astype(int)
+# def auto_convert_df_types(data_frame: pd.DataFrame) -> pd.DataFrame:
+#     """Automatically assigns types to a data frame."""
+#     for col in data_frame.columns:
+#         if isinstance(list(data_frame[col])[0], int):
+#             print('hey1')
+#             data_frame[col] = data_frame[col].astype(int)
 
-        elif isinstance(list(data_frame[col])[0], float):
-            data_frame[col] = data_frame[col].astype(float)
+#         elif isinstance(list(data_frame[col])[0], float):
+#             print('hey2')
+#             data_frame[col] = data_frame[col].astype(float)
 
-        elif isinstance(list(data_frame[col])[0], str):
-            data_frame[col] = data_frame[col].astype(str)
+#         elif isinstance(list(data_frame[col])[0], str):
+#             print('hey3')
+#             data_frame[col] = data_frame[col].astype(str)
         
-        elif isinstance(list(data_frame[col])[0], bytes):
-            data_frame[col] = data_frame[col].str.decode('utf-8')
+#         elif isinstance(list(data_frame[col])[0], bytes):
+#             print('hey4')
+#             data_frame[col] = data_frame[col].str.decode('utf-8')
+
+#     return data_frame
+
+
+def infer_dtype(value: str) -> Union[str, int, float]:
+    try:
+        int(value)
+        return int
+    except ValueError:
+        pass
+
+    try:
+        float(value)
+        return float
+    except ValueError:
+        pass
+
+    return str
+
+def auto_convert_df_types(data_frame: pd.DataFrame) -> pd.DataFrame:
+    for col in data_frame.columns:
+        inferred_dtype = None
+
+        if data_frame[col].dtype != str and data_frame[col].dtype != 'O':
+            continue
+
+        first_value = list(data_frame[col])[0]
+        dtype = infer_dtype(first_value)
+
+        if dtype == str:
+            inferred_dtype = None
+        else:
+            inferred_dtype = dtype
+
+        if inferred_dtype:
+            try:
+                data_frame[col] = data_frame[col].astype(inferred_dtype)
+            except:
+                data_frame[col] = data_frame[col].astype(str)
 
     return data_frame
-
-
 
 def read_data(file_name:str) -> pd.DataFrame:
     """Reads in data of any type and returns a data frame."""
