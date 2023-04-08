@@ -87,14 +87,23 @@ def infer_dtype(value: str) -> Union[str, int, float]:
 def auto_convert_df_types(data_frame: pd.DataFrame) -> pd.DataFrame:
     for col in data_frame.columns:
         inferred_dtype = None
-        for i, value in enumerate(data_frame[col]):
-            dtype = infer_dtype(value)
-            if dtype != str:
-                inferred_dtype = dtype
-                break
+
+        if data_frame[col].dtype != str and data_frame[col].dtype != 'O':
+            continue
+
+        first_value = list(data_frame[col])[0]
+        dtype = infer_dtype(first_value)
+
+        if dtype == str:
+            inferred_dtype = None
+        else:
+            inferred_dtype = dtype
 
         if inferred_dtype:
-            data_frame[col] = data_frame[col].astype(inferred_dtype)
+            try:
+                data_frame[col] = data_frame[col].astype(inferred_dtype)
+            except:
+                data_frame[col] = data_frame[col].astype(str)
 
     return data_frame
 
