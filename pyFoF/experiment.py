@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 from astropy.cosmology import FlatLambdaCDM
 from astropy.table import Table
+
 from .data_handling import read_data
 from .survey import Survey
 from .fof import Trial
@@ -24,8 +25,9 @@ columns_to_drop = (
 class Experiment:
     """Class for one run of the modern algorithm."""
     def __init__(
-        self, d0_initial, d0_final, v0_initial, v0_final,
-        d_max, v_max, n_trials, cutoff, survey, n_workers: Optional[int] = None):
+        self, d0_initial: float, d0_final: float, v0_initial: float, v0_final: float,
+        d_max: float, v_max: float, n_trials: int, cutoff: float, survey: Survey,
+        n_workers: Optional[int] = None):
         """Initializing."""
         self.d0s = np.linspace(d0_initial, d0_final, n_trials)
         self.v0s = np.linspace(v0_initial, v0_final, n_trials)
@@ -40,7 +42,7 @@ class Experiment:
 
         self.cutoff = cutoff
 
-    def run(self, 
+    def run(self,
             use_multiprocessing: bool = True):
         """
         Runs the algorithm.
@@ -85,7 +87,7 @@ class Experiment:
             ) as progress:
                 futures = []  # keep track of the jobs
                 with multiprocessing.Manager() as manager:
-                    # this is the key - we share some state between our 
+                    # this is the key - we share some state between our
                     # main process and our worker functions
                     _progress = manager.dict()
                     overall_progress_task = progress.add_task("[green]All jobs progress:")
@@ -93,7 +95,7 @@ class Experiment:
                     with ProcessPoolExecutor(max_workers=self.n_workers) as executor:
                         for n in range(0, self.number_of_trials):  # iterate over the jobs we need to run
                             # set visible false so we don't have a lot of bars all at once:
-                            task_id = progress.add_task(f"Trial {n+1} (d_0= {np.round(self.d0s[n], 2)}, v_0= {np.round(self.v0s[n], 2)}): ", visible=False)
+                            task_id = progress.add_task(f"Trial {n+1} (d_0 = {np.round(self.d0s[n], 2)}, v_0 = {np.round(self.v0s[n], 2)}): ", visible=False)
                             futures.append(executor.submit( Trial(
                                                             self.survey, {
                                                                 "d_0": self.d0s[n], "v_0": self.v0s[n], "v_max": self.v_max, "d_max": self.d_max
@@ -127,7 +129,7 @@ class Experiment:
                             results.append(future.result())
                         concatenated_results = np.concatenate(results)
                         members_list = [group.members for group in concatenated_results]
-                        
+
             #assert len(results) == self.number_of_trials
             self.members = members_list
         else:
@@ -245,7 +247,7 @@ class Experiment:
         self.write_galaxy_catalog('galaxy_catalog.fits', overwrite)
 
 if __name__ == '__main__':
-    INFILE = './data/Kids/Kids_S_hemispec_no_dupes_updated.tbl'
+    INFILE = '../data/Kids/Kids_S_hemispec_no_dupes_updated.tbl'
 
     #INFILE = './data/Kids/WISE-SGP_redshifts_w1mags.tbl'
     #INFILE = './data/Test_Data/Test_Cat.tbl'
@@ -253,6 +255,7 @@ if __name__ == '__main__':
     data = read_data(INFILE)
     KIDS = Survey(data, cosmo, 18.)
     KIDS.convert_z_into_cz('z_helio')
+    KIDS.add_positional_information_to_df('vel')
     #KIDS.make_mag_colum('W1')
     KIDS.data_frame['mag'] = np.random.normal(15, 2, len(KIDS.data_frame))
     test_run = Experiment(
@@ -261,4 +264,6 @@ if __name__ == '__main__':
         d_max=2., v_max=1000,
         n_trials=10, cutoff=0.5, survey = KIDS
         )
+    test_run.run()
     test_run.write_all_catalogs(overwrite = True)
+    test_run.write_edge_data()
