@@ -45,7 +45,7 @@ def convert_edge_data_to_speck(galaxy_cat_fits: str, edge_data_file: str, number
 
         _write_mesh_speck(
             position_1, position_2, colors[i],
-            f'edge_{round(bins[i+1], 2)}',
+            f'edge_{round(bins[i+1], 2)}.speck',
             f'#Edges ({bins[i]} {bins[i+1]}] \n\n')
 
 

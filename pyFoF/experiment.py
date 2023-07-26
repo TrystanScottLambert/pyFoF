@@ -10,11 +10,11 @@ import pandas as pd
 from astropy.cosmology import FlatLambdaCDM
 from astropy.table import Table
 
-from data_handling import read_data
-from survey import Survey
-from fof import Trial
-from graph_theory import stabalize
-from group import Group
+from .data_handling import read_data
+from .survey import Survey
+from .fof import Trial
+from .graph_theory import stabalize
+from .group import Group
 
 columns_to_drop = (
     'members',
@@ -42,7 +42,7 @@ class Experiment:
 
         self.cutoff = cutoff
 
-    def run(self, 
+    def run(self,
             use_multiprocessing: bool = True):
         """
         Runs the algorithm.
