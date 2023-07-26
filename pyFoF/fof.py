@@ -13,10 +13,10 @@ from scipy.integrate import cumtrapz
 from astropy.cosmology import FlatLambdaCDM
 import rich.progress as rp
 
-from .survey import Survey
-from .utils import calculate_angular_seperation, wrap_mean
-from .data_handling import read_data
-from .group import Group
+from survey import Survey
+from utils import calculate_angular_seperation, wrap_mean
+from data_handling import read_data
+from group import Group
 
 
 class FoFArgs(TypedDict):

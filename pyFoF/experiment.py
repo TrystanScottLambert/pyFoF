@@ -10,11 +10,11 @@ import pandas as pd
 from astropy.cosmology import FlatLambdaCDM
 from astropy.table import Table
 
-from .data_handling import read_data
-from .survey import Survey
-from .fof import Trial
-from .graph_theory import stabalize
-from .group import Group
+from data_handling import read_data
+from survey import Survey
+from fof import Trial
+from graph_theory import stabalize
+from group import Group
 
 columns_to_drop = (
     'members',
@@ -129,7 +129,7 @@ class Experiment:
                             results.append(future.result())
                         concatenated_results = np.concatenate(results)
                         members_list = [group.members for group in concatenated_results]
-                        
+
             #assert len(results) == self.number_of_trials
             self.members = members_list
         else:
@@ -262,7 +262,8 @@ if __name__ == '__main__':
         d0_initial=0.3, d0_final=0.8,
         v0_initial=100, v0_final=500,
         d_max=2., v_max=1000,
-        n_trials=5, cutoff=0.5, survey = KIDS
+        n_trials=10, cutoff=0.5, survey = KIDS
         )
     test_run.run()
     test_run.write_all_catalogs(overwrite = True)
+    test_run.write_edge_data()
