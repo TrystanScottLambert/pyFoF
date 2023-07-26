@@ -22,12 +22,21 @@ def _write_mesh_speck(
                 file.write(f'{coord} ')
             file.write(' \n } \n\n')
 
-def convert_edge_data_to_speck(galaxy_cat_fits: str, edge_data_file: str, number_bins: int) -> None:
+def convert_edge_data_to_speck(
+        galaxy_cat_fits: str, edge_data_file: str,
+        number_bins: int, only_groups: bool = False) -> None:
     """Converts the output edge data file into a speck file."""
+
     galaxy_table = Table.read(galaxy_cat_fits)
     id_1, id_2, weights = np.loadtxt(edge_data_file, unpack=True)
+
+    if only_groups:
+        group_gal_ids = galaxy_table[np.where(galaxy_table['group_id'] != -1)[0]]['fof_ids']
+        mask = np.array([i for i in range(len(id_1)) if id_1[i] in group_gal_ids and id_2[i] in group_gal_ids])
+        id_1, id_2, weights = id_1[mask], id_2[mask], weights[mask]
+
     bins = np.arange(0, 1 + 1./number_bins, 1./number_bins)
-    colors = np.linspace(1, 25, number_bins)
+    colors = np.linspace(0, 25, number_bins)
     for i in range(len(bins) -1):
         position_1 = []
         position_2 = []
