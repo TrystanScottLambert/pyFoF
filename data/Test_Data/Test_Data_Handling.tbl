@@ -1,0 +1,7 @@
+|idname|     ra|      dec|   zcmb|zhelio|    W1|   eW1|
+|  long| double|   double| double|double|double|double|
+|      |       |         |       |      |      |      |
+|  null|   null|     null|   null|  null|  null|  null|
+  94967 3.62163 -33.11417 0.03029 0.0312 15.275  0.056 
+  94976 3.54946 -32.39796 0.05788 0.0588 14.542  0.034 
+  94982 3.53893 -32.71177 0.06229 0.0632 16.445   0.06 
