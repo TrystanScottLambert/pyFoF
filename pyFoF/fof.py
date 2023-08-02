@@ -153,7 +153,7 @@ class ClassicFoF(BaseFoF):
         friends_before = np.array([])
 
         iterations = 0
-        while np.array_equal(friends_after, friends_before) is False:
+        while np.array_equal(friends_after, friends_before) is False and iterations < 100:
             iterations += 1
             friends_before = friends_after
             friends_after = np.unique(np.concatenate(
