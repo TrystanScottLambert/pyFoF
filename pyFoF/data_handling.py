@@ -3,6 +3,8 @@
 from astropy.table import Table
 import pandas as pd
 from typing import Union
+import ast
+import numpy as np
 
 def read_in_fits_table(fits_table_name: str) -> pd.DataFrame:
     """reads in a fits table."""
@@ -68,21 +70,20 @@ def check_file_type(file_name: str) -> str:
 
 #     return data_frame
 
-
-def infer_dtype(value: str) -> Union[str, int, float]:
+def infer_dtype(value: str) -> Union[np.dtype, type]:
+    if not value.strip():
+        return np.dtype('O')
+    
     try:
-        int(value)
-        return int
-    except ValueError:
+        val = type(ast.literal_eval(value))
+        if val is int:
+            return np.dtype('int64')
+        elif val is float:
+            return np.dtype('float64')
+    except (SyntaxError, ValueError):
         pass
 
-    try:
-        float(value)
-        return float
-    except ValueError:
-        pass
-
-    return str
+    return np.dtype('O')
 
 def auto_convert_df_types(data_frame: pd.DataFrame) -> pd.DataFrame:
     for col in data_frame.columns:
@@ -119,4 +120,9 @@ if __name__ == '__main__':
     INFILE_FITS = './data/Kids/WISE-SGP_redshifts_w1mags.fits'
 
     df = read_data(INFILE)
+    print(df.dtypes)
+    print(df.head(3))
     df_fits = read_data(INFILE_FITS)
+    print(df_fits.dtypes)
+    print(df_fits.head(3))
+    
