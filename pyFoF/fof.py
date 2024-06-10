@@ -278,7 +278,7 @@ if __name__ == '__main__':
     data = read_data(INFILE)
     KIDS = Survey(data, cosmo, 11.75)
     KIDS.convert_z_into_cz('zcmb')
-    KIDS.make_mag_colum('W1')
+    KIDS.make_mag_column('W1')
     my_fof_args: FoFArgs = {"d_0": 0.56, "v_0": 350., "v_max": 1500., "d_max": 2.0}
     test_run = Trial(KIDS, my_fof_args)
     test = test_run.run(progress_mode='single_trial')

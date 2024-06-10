@@ -256,7 +256,7 @@ if __name__ == '__main__':
     KIDS = Survey(data, cosmo, 18.)
     KIDS.convert_z_into_cz('z_helio')
     KIDS.add_positional_information_to_df('vel')
-    #KIDS.make_mag_colum('W1')
+    #KIDS.make_mag_column('W1')
     KIDS.data_frame['mag'] = np.random.normal(15, 2, len(KIDS.data_frame))
     test_run = Experiment(
         d0_initial=0.3, d0_final=0.8,
