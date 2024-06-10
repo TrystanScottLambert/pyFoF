@@ -52,7 +52,7 @@ class Survey:
         """Takes the z column and makes a redhsift column in km/s."""
         self.data_frame['vel'] = self.data_frame[z_column_name] * c.c.to(u.km/u.s).value
 
-    def make_mag_colum(self, mag_column_name) -> None:
+    def make_mag_column(self, mag_column_name) -> None:
         """Copies the magnitude column and changes it into the needed keyword 'mag' """
         self.data_frame['mag'] = self.data_frame[mag_column_name]
 
