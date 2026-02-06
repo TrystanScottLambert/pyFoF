@@ -6,6 +6,8 @@ from typing import Union
 import ast
 import numpy as np
 
+from pyFoF.data_validation import validate_astronomical_data
+
 def read_in_fits_table(fits_table_name: str) -> pd.DataFrame:
     """reads in a fits table."""
     fits_table = Table.read(fits_table_name)
@@ -108,11 +110,24 @@ def auto_convert_df_types(data_frame: pd.DataFrame) -> pd.DataFrame:
 
     return data_frame
 
-def read_data(file_name:str) -> pd.DataFrame:
-    """Reads in data of any type and returns a data frame."""
+def read_data(file_name: str, validate: bool = True) -> pd.DataFrame:
+    """Reads in data of any type and returns a data frame.
+    
+    Args:
+        file_name: Path to the data file
+        validate: If True, performs astronomical data validation and issues
+                 warnings for invalid values
+                 
+    Returns:
+        DataFrame containing the read data
+    """
     ext = check_file_type(file_name)
     d_f = EXTENSIONS[ext](file_name)
     d_f = auto_convert_df_types(d_f)
+    
+    if validate:
+        validate_astronomical_data(d_f)
+    
     return d_f
 
 if __name__ == '__main__':
